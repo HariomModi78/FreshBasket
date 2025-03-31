@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheets/placeOrder.css">
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
+</head>
+<body>
+    <main>
+        <h2 class="header">Delivery Address</h2>
+        <div class="tracker">
+        <div class="diagram">
+            <div class="circle current">1</div>
+            <div class="line"></div>
+            <div class="circle">2</div>
+            <div class="line"></div>
+            <div class="circle">3</div>
+        </div>
+        <div class="stepName">
+            <div class="addressStep">Address</div>
+            <div class="orderDetailsStep">Order Details</div>
+            <div class="paymentStep">Payment</div>
+        </div>
+    </div>
+    <div class="address" >
+        <div class="addressHeader">
+            <p>Delivery Address:</p>
+            <div class="addressChange" style="display: none;">Change</div>
+        </div>
+        <div class="userName">Hariom Modi</div>
+        <div class="addressText editAddress" contenteditable="true" id="<%=product._id%>">
+            <%=user.address%>
+        </div>
+    </div>
+    
+        <div class="fakeFooter"></div>
+        <div class="footer" >
+            <form action="/orderAddress/placeOrder/<%=product._id%>" method="post"> 
+                <input type="hidden" name="address" calss="newAddress" value="<%=user.address%>">
+                <input type="submit" value="Save"  class="confirmOrder">
+            </form>
+       
+        </div>
+    </main>
+    <!-- <script src="/javaScripts/nav.js"></script> -->
+    <script src="/javaScripts/orderAddress.js"></script>
+    
+</body>
+</html>

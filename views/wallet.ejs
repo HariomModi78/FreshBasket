@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheets/wallet.css">
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
+</head>
+<body>
+    <main>
+       
+        <h1 class="walletText">Wallet</h1>
+        <div class="balance">
+            <div class="text">
+                <p>wallet Balance</p>
+                <p class="price">₹<%=user.walletBalance%></p>
+            </div>
+            <i class="ri-arrow-right-s-line"></i>
+            
+        </div>
+        <div class="addMoney">
+            <div class="input">
+                <h2>₹</h2>
+                <input type="number" class="inputPrice" name="" value="500" id="">
+            </div>
+            <div class="option">
+                <div class="box">₹500</div>
+                <div class="box">₹1000</div>
+                <div class="box">₹1500</div>
+                <div class="box">₹5000</div>
+            </div>
+            <div class="pay">Pay</div>
+        </div>
+        <div class="couponText">Have a Coupon Code?</div>
+        <div class="offer">
+            <div class="coupon"></div>
+            <div class="coupon"></div>
+            <div class="coupon"></div>
+            <div class="coupon"></div>
+        </div>
+
+        <div class="fakeFooter"></div>
+        <div class="footer">
+            <div class="footerBox home">
+                <img src="/images/home.png" alt="">
+                <p>Home</p>
+            </div>
+            <div class="footerBox seller">
+                <img src="/images/seller.png" alt="">
+                <p>Seller</p>
+            </div>
+            <div class="footerBox center cart">
+                <img src="/images/cart.gif" alt="">
+                <p>Cart</p>
+
+            </div>
+            <div class="footerBox feed">
+                <img src="/images/food.png" alt="">
+                <p>Feed</p>
+            </div>
+            <div class="footerBox more">
+                <img src="/images/more.png" alt="">
+                <p>More</p>
+            </div>
+        </div>
+    </main>
+    <script src="/javaScripts/nav.js"></script>
+    <script src="/javaScripts/wallet.js"></script>
+    
+</body>
+</html>
