@@ -7,6 +7,11 @@ const CookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
 
+const http = require("http");
+const server = http.createServer(app);
+const socket = require("socket.io")
+const io = socket(server)
+
 const userDataBase = require("./models/user.js");
 const categaryDataBase = require("./models/categary.js");
 const sellerDataBase = require("./models/seller.js");
@@ -56,7 +61,7 @@ function sendMail(to,sub,msg){
     })
 }
 
-app.listen(3000,function(){
+server.listen(3000,function(){
     //.log("server is running ");
 })
 
@@ -66,8 +71,20 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname,"public")));
 app.set("view engine","ejs");
 
-app.get("/",function(req,res){
+app.get("/",async function(req,res){
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email}); 
+        console.log(user.email);
+        if(req.cookies.otp){
+     res.render("login");
+        }
+        else{
+            res.redirect("/home")
+
+        }
+    }catch(e){
     res.render("login");
+    }
 }) 
 // app.get("/",function(req,res){
 //     res.render("feed");
@@ -95,11 +112,12 @@ app.post("/verify",async function(req,res){
     //.log(parseInt(otp))
     if(otp==data.otp){
         let user = await userDataBase.findOne({email:req.cookies.email});
-        if(!user){
+        if(!user){ 
             await userDataBase.create({
                 email:req.cookies.email
             })
         }
+        
         res.redirect("/home");
     }
     else{
@@ -391,4 +409,42 @@ app.post("/detail",async function(req,res){
 app.get("/logout",function(req,res){
     res.cookie("email",undefined);
     res.redirect("/")
+})
+
+
+
+app.get("/placeOrder/:productId",async function(req,res){
+    let user = await userDataBase.findOne({email:req.cookies.email});
+    let product = await productDataBase.findOne({_id:req.params.productId});
+    res.render("placeOrder",{product:product,user:user});
+})   
+app.post("/orderAddress/placeOrder/:productId",async function(req,res){
+
+    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        address:req.body.address
+    });
+    let product = await productDataBase.findOne({_id:req.params.productId});
+    res.redirect(`/placeOrder/${product._id}`);
+}) 
+app.get("/orderAddress/:userId/:productId",async function(req,res){
+
+    let user = await userDataBase.findOne({_id:req.params.userId});
+    let product = await productDataBase.findOne({_id:req.params.productId});
+    res.render("orderAddress",{user:user,product:product});
+}) 
+app.post("/orderPayment/:productId",async function(req,res){
+    let user = await userDataBase.findOne({email:req.cookies.email});
+    let product  = await productDataBase.findOne({_id:req.params.productId});
+    res.render("orderPayment",{user:user,product:product})
+})   
+
+
+
+
+
+io.on("connect",function(socket){
+    console.log("connected")
+    socket.on("disconnect",function(){
+        console.log("disconnected")
+    })
 })
