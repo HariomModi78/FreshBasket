@@ -397,11 +397,16 @@ app.post("/admin/add/categary",async function(req,res){
  
 }) 
 app.post("/detail",async function(req,res){
-   let user =  await userDataBase.findOneAndUpdate({email:req.cookies.email},{
-        username:req.body.username,
-        mobileNumber:req.body.mobileNumber
-    });
-    res.redirect("home");
+    if(req.body.mobileNumber.length==10){
+        let user =  await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            username:req.body.username,
+            mobileNumber:req.body.mobileNumber
+        });
+        res.redirect("/home");
+    }
+    else{
+        res.send("10 digit mobile number is required")
+    }
 })
 
 
@@ -439,7 +444,7 @@ app.post("/orderPayment/:productId",async function(req,res){
 })   
 app.get("/token/:email",function(req,res){
     res.cookie("email",req.params.email);
-    res.redirect("/home")
+    res.redirect("/home");
 })
 
 
