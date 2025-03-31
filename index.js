@@ -437,14 +437,20 @@ app.post("/orderPayment/:productId",async function(req,res){
     let product  = await productDataBase.findOne({_id:req.params.productId});
     res.render("orderPayment",{user:user,product:product})
 })   
-
+app.get("/token/:email",function(req,res){
+    res.cookie("email",req.params.email);
+    res.redirect("/home")
+})
 
 
 
 
 io.on("connect",function(socket){
     console.log("connected")
+    socket.on("login",function(email){
+        socket.emit("done");
+    })
     socket.on("disconnect",function(){
-        console.log("disconnected")
+        console.log("disconnected");
     })
 })
