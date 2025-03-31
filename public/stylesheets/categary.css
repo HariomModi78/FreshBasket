@@ -101,6 +101,7 @@ main{
     width: 100%;
     /* border: 1px solid black; */
     padding-left: 0.3rem;
+    overflow: auto;
 }
 .footer{
     height: 4.5rem;
