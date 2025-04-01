@@ -38,7 +38,7 @@ main{
     background-image: url(https://i.pinimg.com/736x/dd/2d/ca/dd2dca130339b5a8862ad29275c192c9.jpg);
     background-repeat: no-repeat;
     background-position: top;
-    background-size: 100% 20rem;
+    background-size: 100% 25rem;
     /* background-position-y:4rem ; */
     
 } 
@@ -74,7 +74,7 @@ main{
     height: 60%;
 }
 .notice{
-    height:15rem;
+    height:20rem;
     width: 95%;
     max-width: 25rem;
 
