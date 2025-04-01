@@ -289,6 +289,7 @@ main{
 .home,.more{
     bottom:0
 }
+
 .seller,.feed{
     bottom:1.3rem;
 }
@@ -311,6 +312,10 @@ main{
 .footerBox img{
     height: 1.6rem;
     width: 1.6rem;
+}
+.seller img{
+    height: 1.9rem;
+    width: 1.9rem;
 }
 .fakeFooter{
     height: 5rem;
