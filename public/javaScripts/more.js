@@ -32,5 +32,6 @@ support.addEventListener("click",function(){
     window.location.href = "/support"
 })
 logout.addEventListener("click",function(){
+    localStorage.removeItem("email");
     window.location.href = "/logout"
 })
