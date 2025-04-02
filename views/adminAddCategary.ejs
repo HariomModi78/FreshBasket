@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheets/adminProduct.css">
+</head>
+<body> 
+    <main>
+        <div class="header">
+            Admin Dashboard
+        </div>
+        <p >Add New Categary</p>
+        <form action="/admin/add/categary" method="post">
+            <input type="text" name="name" id="" placeholder="Categary Name">
+            <input type="text" name="imagePath" id="" placeholder="Image URL">
+            <input type="submit" value="Add">
+        </form>
+
+        <div class="fakeFooter"></div>
+        <div class="footer">
+            <div class="footerBox home">
+                <img src="/images/product.png" alt="">
+                <p>Products</p>
+            </div>
+            <div class="footerBox seller">
+                <img src="/images/user.png" alt="">
+                <p>User Details</p>
+            </div>
+            <div class="footerBox center cart">
+                <img src="/images/order.png" alt="">
+                <p>Orders</p>
+
+            </div>
+            <div class="footerBox feed">
+                <img src="/images/revenue.png" alt="">
+                <p>Revenue</p>
+            </div>
+            <div class="footerBox more">
+                <img src="/images/adminMore.png" alt="">
+                <p>More</p>
+            </div>
+        </div>
+    </main>
+    <script src="/javaScripts/adminNav.js"></script>
+    
+</body>
+</html>
