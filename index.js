@@ -16,7 +16,9 @@ const userDataBase = require("./models/user.js");
 const categaryDataBase = require("./models/categary.js");
 const sellerDataBase = require("./models/seller.js");
 const productDataBase = require("./models/product.js");
-const product = require("./models/product.js");
+const transactionDataBase = require("./models/transaction.js");
+const orderDataBase = require("./models/order.js");
+
 require('dotenv').config();
 
 const cloudinary = require('cloudinary').v2;
@@ -181,8 +183,10 @@ app.get("/wallet",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email});
     res.render("wallet",{user:user});
 })
-app.get("/transaction",function(req,res){
-    res.render("transaction");
+app.get("/transaction",async function(req,res){
+    let user = await userDataBase.findOne({email:req.cookies.email});
+    let transaction = await transactionDataBase.find({userId:user._id}).sort({ date: -1 });
+    res.render("transaction",{user:user,transaction:transaction});
 })
 app.get("/profile",async function(req,res){
    let user =  await userDataBase.findOne({email:req.cookies.email});
@@ -191,8 +195,10 @@ app.get("/profile",async function(req,res){
 app.get("/subscription",function(req,res){
     res.render("subscription");
 })
-app.get("/order",function(req,res){
-    res.render("order");
+app.get("/order",async function(req,res){
+    let user = await userDataBase.findOne({email:req.cookies.email});
+    let order = await orderDataBase.find({userId:user._id});
+    res.render("order",{order:order});
 })
 app.get("/mySubscription",function(req,res){
     res.render("mySubscription");
@@ -447,7 +453,74 @@ app.get("/token/:email",function(req,res){
     res.redirect("/home");
 })
 
+app.get("/pay/:amount/:userId",async function(req,res){
+    let user = await userDataBase.findOne({_id:req.params.userId});
+    await userDataBase.findOneAndUpdate({_id:req.params.userId},{
+        walletBalance:(parseFloat(req.params.amount) + parseFloat(user.walletBalance)).toFixed(2)
+    })
+    await transactionDataBase.create({
+        userId:user._id,
+        amount:req.params.amount,
+        paymentMode:"Online",
+        utr:"12345679012",
+        status:"complete",
+        date:new Date(),
+        totalBalance:(parseFloat(user.walletBalance) +parseFloat(req.params.amount)).toFixed(2),
+        direction:"+"
 
+    })
+    res.redirect("/wallet")
+})
+app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
+    let product =  await productDataBase.findOne({_id:req.params.productId});
+       let user =  await userDataBase.findOne({email:req.cookies.email});
+    let amount = parseFloat((((product.price *parseInt(req.params.item) )+(((product.price *parseInt(req.params.item))*2)/100 )+(((((product.price *parseInt(req.params.item))*2)/100 ))*18)/100)).toFixed(2));
+    try{
+       
+       if(user.walletBalance>=(amount)){
+        console.log("total AMount : ",amount)
+        for(let i=0;i<parseInt(req.params.item);i++){
+            console.log("order done")
+            await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+                $push:{order:req.params.productId}
+            })
+            await orderDataBase.create({
+                userId:user._id,
+                productId:product._id,
+                date:new Date(),
+                buyingPrice:product.price,
+                paymentStatus:"paid",
+                orderStatus:"order placed",
+                name:product.name,
+                quantity:product.quantity,
+                imagePath:product.imagePath
+            })
+        }
+        await transactionDataBase.create({
+            userId:user._id,
+            amount:(amount).toString(),
+            paymentMode:`${req.params.wallet}`,
+            utr:"12345679012",
+            status:"complete",
+            date:new Date(),
+            totalBalance:(parseFloat(user.walletBalance) -amount).toFixed(2),
+            direction:"-"
+        })
+        
+        await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            walletBalance:(parseFloat(user.walletBalance) -amount).toFixed(2)
+        })
+        res.redirect(`/order`);
+       }
+       else{
+        res.send("insufficent balance");
+       }
+        
+    }catch(e){
+        res.send("product not exist")
+    }
+    
+})
 
 
 io.on("connect",function(socket){
