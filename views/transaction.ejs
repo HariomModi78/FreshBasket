@@ -50,7 +50,7 @@
                     <%if(val.direction == "+"){%>
                         <div class="transaction">
                             <div class="part1">
-                                <div class="date"><%= new Date(val.date).toLocaleDateString()%> <b style="font-size: 0.8rem;padding-left: 0.3rem;"><%= new Date(val.date).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })%></b></div>
+                                <div class="date"><%= new Date(val.date).toLocaleDateString()%> <b style="font-size: 0.8rem;padding-left: 0.3rem;"><%= new Date(val.date).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" })%></b></div>
                                 <div class="price">+₹<%=val.amount%></div>
                             </div>
                             <div class="part2">
