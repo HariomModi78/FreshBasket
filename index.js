@@ -93,85 +93,101 @@ app.get("/",async function(req,res){
 // })
 app.post("/otp",function(req,res){
     let otp = parseInt((Math.random()*9000)+1000);
-    //.log(req.body.email);
     
 
-        sendMail(req.body.email,"OTP",otp);
+       sendMail(req.body.email,"OTP",otp);
         res.cookie("email",req.body.email);
-    
-    
     let data = jwt.sign({otp:otp,email:req.body.email},process.env.SECRET);
-    // //.log(otp)
     res.cookie("otp",data)
-    //.log(data);
     res.render("otp");
 })
 app.post("/verify",async function(req,res){
-    //.log(req.cookies.otp)
-    let data = jwt.verify(req.cookies.otp,process.env.SECRET);
-    //.log(data);
-    let otp = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
-    //.log(parseInt(otp))
-    if(otp==data.otp){
-        let user = await userDataBase.findOne({email:req.cookies.email});
-        if(!user){ 
-            await userDataBase.create({
-                email:req.cookies.email
-            })
+    try{
+        let data = jwt.verify(req.cookies.otp,process.env.SECRET);
+        let otp = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
+        if(otp==data.otp){
+            let user = await userDataBase.findOne({email:req.cookies.email});
+            if(!user){ 
+                await userDataBase.create({
+                    email:req.cookies.email
+                })
+            }
+            
+            res.redirect("/home");
         }
-        
-        res.redirect("/home");
+        else{
+            res.send("invalid otp")
+        } 
+    }catch(e){
+        res.render("error")
     }
-    else{
-        res.send("invalid otp")
-    } 
+    
 })
 app.get("/sellerSignup",async function(req,res){
-    let user = await userDataBase.findOne({email:req.cookies.email});
-    if(user.type =="farmer"){
-        res.render("sellerPage",{user:user});
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email});
+        if(user.type =="farmer"){
+            res.render("sellerPage",{user:user});
+        }
+        else{
+            res.render("sellerSignup",{user:user});
+        }
+    }catch(e){
+        res.render("error")
     }
-    else{
-        res.render("sellerSignup",{user:user});
-    }
+    
 })
 app.post("/sellerSignup1",upload.single("image"),async function(req,res){
     //.log("file data ",req.file)
+    try{
+        const file = req.file.path;
+        const cloudinaryResponce = await cloudinary.uploader.upload(file,{
+                
+            folder:"Uploads"
+        })
+        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            type:"farmer",
+            address:req.body.address,
+            profilePicture:cloudinaryResponce.url
+        })
+        await sellerDataBase.create({
+            userId:user._id
+        })
+        res.render("sellerPage",{user:user});
+    }catch(e){
+        res.render("error")
+    }
     
-                const file = req.file.path;
-    const cloudinaryResponce = await cloudinary.uploader.upload(file,{
-            
-        folder:"Uploads"
-    })
-    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
-        type:"farmer",
-        address:req.body.address,
-        profilePicture:cloudinaryResponce.url
-    })
-    await sellerDataBase.create({
-        userId:user._id
-    })
-    res.render("sellerPage",{user:user});
 })
 app.get("/home",async function(req,res){
-    if(req.cookies.email){
-        let user =  await userDataBase.findOne({email:req.cookies.email});
-        let categary = await categaryDataBase.find();
-        let product = await productDataBase.find();
-        
-         res.render("home",{user:user,categary:categary,product:product});
+    try{
+        if(req.cookies.email){
+            let user =  await userDataBase.findOne({email:req.cookies.email});
+            let categary = await categaryDataBase.find();
+            let product = await productDataBase.find();
+            
+             res.render("home",{user:user,categary:categary,product:product});
+        }
+        else{
+            res.send("Page Not Found")
+        }
+    }catch(e){
+        res.render("error")
     }
-    else{
-        res.send("Page Not Found")
-    }
+    
 })
 
 app.get("/feed",function(req,res){
     res.render("feed");
 })
 app.get("/more",async function(req,res){
-   let user =  await userDataBase.findOne({email:req.cookies.email});
-    res.render("more",{user:user});
+    try{
+        let user =  await userDataBase.findOne({email:req.cookies.email});
+        res.render("more",{user:user});
+    }catch(e){
+        res.render("error")
+    }
+   
 })
 app.get("/checkProfit",function(req,res){
     res.render("checkProfit");
@@ -180,25 +196,45 @@ app.get("/refer",function(req,res){
     res.render("refer");
 })
 app.get("/wallet",async function(req,res){
-    let user = await userDataBase.findOne({email:req.cookies.email});
-    res.render("wallet",{user:user});
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email});
+        res.render("wallet",{user:user});
+    }catch(e){
+        res.render("error")
+    }
+    
 })
 app.get("/transaction",async function(req,res){
-    let user = await userDataBase.findOne({email:req.cookies.email});
-    let transaction = await transactionDataBase.find({userId:user._id}).sort({ date: -1 });
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email});
+    let transaction = await transactionDataBase.find({userId:user._id}).sort({date: -1 });
     res.render("transaction",{user:user,transaction:transaction});
+    }catch(e){
+        res.render("error")
+    }
+    
 })
 app.get("/profile",async function(req,res){
-   let user =  await userDataBase.findOne({email:req.cookies.email});
-    res.render("profile",{user:user});
+    try{
+        let user =  await userDataBase.findOne({email:req.cookies.email});
+        res.render("profile",{user:user});
+    }catch(e){
+        res.render("error")
+    }
+   
 })
 app.get("/subscription",function(req,res){
     res.render("subscription");
 })
 app.get("/order",async function(req,res){
-    let user = await userDataBase.findOne({email:req.cookies.email});
-    let order = await orderDataBase.find({userId:user._id});
-    res.render("order",{order:order});
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email});
+        let order = await orderDataBase.find({userId:user._id}).sort({date: -1 });
+        res.render("order",{order:order});
+    }catch(e){
+        res.render("error")
+    }
+    
 })
 app.get("/mySubscription",function(req,res){
     res.render("mySubscription");
@@ -215,7 +251,7 @@ app.get("/productView/:productId",async function(req,res){
         let products = await productDataBase.find();
         res.render("productView",{product:product,products:products});
     }catch(e){
-        res.send("Page Not Found")
+        res.render("error")
     }
    
 }) 
@@ -224,12 +260,13 @@ app.get("/categary/:productName",async function(req,res){
         let product  = await productDataBase.find({categary:req.params.productName})
         res.render("categary",{product:product});
     }catch(e){
-        res.send("page not found");
+        res.render("error")
     }
     
 }) 
 function admin(email){
-    if(email=="scmodi9@gmail.com"){
+    if(email==process.env.email){
+        console.log(process.env.email)
         return true;
     }
     else{
@@ -237,15 +274,20 @@ function admin(email){
     }
 }
 app.get("/admin/product",async function(req,res){
-    if(admin(req.cookies.email)){
-        //.log("admin is watching")
-         let categary = await categaryDataBase.find();
-
-        res.render("adminProduct",{categary:categary});
+    try{
+        if(admin(req.cookies.email)){
+            //.log("admin is watching")
+             let categary = await categaryDataBase.find();
+    
+            res.render("adminProduct",{categary:categary});
+        }
+        else{
+            res.render("error")
+        } 
+    }catch(e){
+        res.render("error")
     }
-    else{
-        res.send("You are not admin");
-    } 
+    
 }) 
 app.get("/admin/user",function(req,res){
     if(admin(req.cookies.email)){
@@ -262,7 +304,7 @@ app.get("/admin/add/categary",function(req,res){
         res.render("adminAddCategary");
     }
     else{
-        res.send("You are not admin");
+        res.render("error")
     } 
 }) 
 app.get("/admin/categary/update/:categary",async function(req,res){
@@ -277,47 +319,53 @@ app.get("/admin/categary/update/:categary",async function(req,res){
         
     }
     else{ 
-        res.send("You are not admin");
+        res.render("error")
     } 
 }catch(e){
-    res.send("page not found");
+    res.render("error")
 }
 })
 app.get("/admin/add/product/:categary",async function(req,res){
+    try{
+
     if(admin(req.cookies.email)){
-        try{
             let categary = await categaryDataBase.findOne({name:req.params.categary})
             res.render("adminAddProduct",{categary:categary})
-        }catch(e){
-            res.send("page not found")
-        }
+       
         
     }
     else{
-        res.send("You are not admin");
+        res.render("error")
     } 
+    }catch(e){
+    res.render("error")
+    }
 })
 app.post("/admin/addProduct",async function(req,res){
-    let product = await productDataBase.create({
-        name:req.body.name,
-        price:req.body.price,
-        discription:req.body.discription,
-        quantity:req.body.quantity,
-        categary:req.body.categary,
-        imagePath:req.body.imagePath
-    }) 
-    await categaryDataBase.findOneAndUpdate({name:product.categary},{
-        $push:{productId:product._id}
-    })
-    res.redirect("/admin/product")
-    // res.send("WOrkin")
+    try{
+        let product = await productDataBase.create({
+            name:req.body.name,
+            price:req.body.price,
+            discription:req.body.discription,
+            quantity:req.body.quantity,
+            categary:req.body.categary,
+            imagePath:req.body.imagePath
+        }) 
+        await categaryDataBase.findOneAndUpdate({name:product.categary},{
+            $push:{productId:product._id}
+        })
+        res.redirect("/admin/product")
+    }catch(e){
+        res.render("error")
+    }
+    
 })
 app.get("/admin/UpdateProduct/:productId",async function(req,res){
     try{
         let product = await productDataBase.findOne({_id:req.params.productId});
         res.render("adminUpdateProduct",{product:product});
     }catch(e){
-        res.send("page not found")
+        res.render("error")
     }
     
 })
@@ -333,86 +381,105 @@ app.post("/admin/updateProduct/:productId",async function(req,res){
         }) 
         res.redirect("/admin/product")
     }catch(e){
-        res.send("page not found")
+        res.render("error")
     }
     
     // res.send("WOrkin")
 })
 app.get("/admin/user/:user",async function(req,res){
-    
-    if(admin(req.cookies.email)){
-        //.log("admin is watching");
-        if(req.params.user == "user"){
-            try{
-                let user = await userDataBase.find();
-                res.render("adminUserView",{user:user});
-            }catch(e){
-                res.send("page not found")
+    try{
+        if(admin(req.cookies.email)){
+            //.log("admin is watching");
+            if(req.params.user == "user"){
+                try{
+                    let user = await userDataBase.find();
+                    res.render("adminUserView",{user:user});
+                }catch(e){
+                    res.send("page not found")
+                }
+                
             }
-            
+            else{
+                try{
+                    let user = await userDataBase.find({type:req.params.user});
+                    res.render("adminUserView",{user:user});
+                }catch(e){
+                    res.send("page not found")
+                }
+                
+            }
+        
         }
         else{
-            try{
-                let user = await userDataBase.find({type:req.params.user});
-                res.render("adminUserView",{user:user});
-            }catch(e){
-                res.send("page not found")
-            }
-            
-        }
-    
+            res.send("You are not admin");
+        } 
+    }catch(e){
+        res.render("error")
     }
-    else{
-        res.send("You are not admin");
-    } 
+    
 })
 app.post("/admin/categary/update/:categary",async function(req,res){
-    if(admin(req.cookies.email)){
-        //.log("admin is watching");
-        if(req.body.delete == req.body.name){
-            try{
-                await categaryDataBase.findOneAndDelete({name:req.body.delete});
-            }catch(e){
-                res.send("page not found")
+    try{
+        if(admin(req.cookies.email)){
+            //.log("admin is watching");
+            if(req.body.delete == req.body.name){
+                try{
+                    await categaryDataBase.findOneAndDelete({name:req.body.delete});
+                }catch(e){
+                    res.send("page not found")
+                }
             }
+            else{
+                try{
+                    await categaryDataBase.findOneAndUpdate({name:req.params.categary},{
+                        name:req.body.name,
+                        imagePath:req.body.imagePath
+                    })
+                }catch(e){
+                    res.send("page not found")
+                }
+               
+            }
+            
+            res.redirect("/admin/product");
         }
         else{
-            try{
-                await categaryDataBase.findOneAndUpdate({name:req.params.categary},{
-                    name:req.body.name,
-                    imagePath:req.body.imagePath
-                })
-            }catch(e){
-                res.send("page not found")
-            }
-           
-        }
-        
-        res.redirect("/admin/product");
+            res.send("You are not admin");
+        } 
+    }catch(e){
+        res.render("error")
     }
-    else{
-        res.send("You are not admin");
-    } 
+    
 })
 app.post("/admin/add/categary",async function(req,res){
-    await categaryDataBase.create({
-        name:req.body.name,
-        imagePath:req.body.imagePath
-    })
-    res.redirect("/admin/product");
+    try{
+        await categaryDataBase.create({
+            name:req.body.name,
+            imagePath:req.body.imagePath
+        })
+        res.redirect("/admin/product");
+    }catch(e){
+        res.render("error")
+    }
+    
  
 }) 
 app.post("/detail",async function(req,res){
-    if(req.body.mobileNumber.length==10){
-        let user =  await userDataBase.findOneAndUpdate({email:req.cookies.email},{
-            username:req.body.username,
-            mobileNumber:req.body.mobileNumber
-        });
-        res.redirect("/home");
+    try{
+        if(req.body.mobileNumber.length==10){
+            let user =  await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+                username:req.body.username,
+                mobileNumber:req.body.mobileNumber
+            });
+            res.redirect("/home");
+        }
+        else{
+            res.send("10 digit mobile number is required")
+        }
+    }catch(e){
+        res.render("error")
     }
-    else{
-        res.send("10 digit mobile number is required")
-    }
+    
 })
 
 
@@ -425,28 +492,46 @@ app.get("/logout",function(req,res){
 
 
 app.get("/placeOrder/:productId",async function(req,res){
-    let user = await userDataBase.findOne({email:req.cookies.email});
-    let product = await productDataBase.findOne({_id:req.params.productId});
-    res.render("placeOrder",{product:product,user:user});
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email});
+        let product = await productDataBase.findOne({_id:req.params.productId});
+        res.render("placeOrder",{product:product,user:user});
+    }catch(e){
+        res.render("error")
+    }
+    
 })   
 app.post("/orderAddress/placeOrder/:productId",async function(req,res){
-
-    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
-        address:req.body.address
-    });
-    let product = await productDataBase.findOne({_id:req.params.productId});
-    res.redirect(`/placeOrder/${product._id}`);
+    try{
+        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            address:req.body.address
+        });
+        let product = await productDataBase.findOne({_id:req.params.productId});
+        res.redirect(`/placeOrder/${product._id}`);
+    }catch(e){
+        res.render("error")
+    }
+    
 }) 
 app.get("/orderAddress/:userId/:productId",async function(req,res){
-
-    let user = await userDataBase.findOne({_id:req.params.userId});
-    let product = await productDataBase.findOne({_id:req.params.productId});
-    res.render("orderAddress",{user:user,product:product});
+    try{
+        let user = await userDataBase.findOne({_id:req.params.userId});
+        let product = await productDataBase.findOne({_id:req.params.productId});
+        res.render("orderAddress",{user:user,product:product});
+    }catch(e){
+        res.render("error")
+    }
+    
 }) 
 app.post("/orderPayment/:productId",async function(req,res){
-    let user = await userDataBase.findOne({email:req.cookies.email});
-    let product  = await productDataBase.findOne({_id:req.params.productId});
-    res.render("orderPayment",{user:user,product:product})
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email});
+        let product  = await productDataBase.findOne({_id:req.params.productId});
+        res.render("orderPayment",{user:user,product:product})
+    }catch(e){
+        res.render("error")
+    }
+    
 })   
 app.get("/token/:email",function(req,res){
     res.cookie("email",req.params.email);
@@ -454,29 +539,35 @@ app.get("/token/:email",function(req,res){
 })
 
 app.get("/pay/:amount/:userId",async function(req,res){
-    let user = await userDataBase.findOne({_id:req.params.userId});
-    await userDataBase.findOneAndUpdate({_id:req.params.userId},{
-        walletBalance:(parseFloat(req.params.amount) + parseFloat(user.walletBalance)).toFixed(2)
-    })
-    await transactionDataBase.create({
-        userId:user._id,
-        amount:req.params.amount,
-        paymentMode:"Online",
-        utr:"12345679012",
-        status:"complete",
-        date:new Date(),
-        totalBalance:(parseFloat(user.walletBalance) +parseFloat(req.params.amount)).toFixed(2),
-        direction:"+"
-
-    })
-    res.redirect("/wallet")
+    try{
+        let user = await userDataBase.findOne({_id:req.params.userId});
+        await userDataBase.findOneAndUpdate({_id:req.params.userId},{
+            walletBalance:(parseFloat(req.params.amount) + parseFloat(user.walletBalance)).toFixed(2)
+        })
+        await transactionDataBase.create({
+            userId:user._id,
+            amount:req.params.amount,
+            paymentMode:"Online",
+            utr:"12345679012",
+            status:"complete",
+            date:new Date(),
+            totalBalance:(parseFloat(user.walletBalance) +parseFloat(req.params.amount)).toFixed(2),
+            direction:"+"
+    
+        })
+        res.redirect("/wallet")
+    }catch(e){
+        res.render("error")
+    }
+    
 })
 app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
-    let product =  await productDataBase.findOne({_id:req.params.productId});
-       let user =  await userDataBase.findOne({email:req.cookies.email});
-    let amount = parseFloat((((product.price *parseInt(req.params.item) )+(((product.price *parseInt(req.params.item))*2)/100 )+(((((product.price *parseInt(req.params.item))*2)/100 ))*18)/100)).toFixed(2));
+    
+    
     try{
-       
+        let product =  await productDataBase.findOne({_id:req.params.productId});
+        let user =  await userDataBase.findOne({email:req.cookies.email});
+        let amount = parseFloat((((product.price *parseInt(req.params.item) )+(((product.price *parseInt(req.params.item))*2)/100 )+(((((product.price *parseInt(req.params.item))*2)/100 ))*18)/100)).toFixed(2));
        if(user.walletBalance>=(amount)){
         console.log("total AMount : ",amount)
         for(let i=0;i<parseInt(req.params.item);i++){
@@ -517,9 +608,13 @@ app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
        }
         
     }catch(e){
-        res.send("product not exist")
-    }
+        res.render("error")
+    } 
     
+})
+app.get("/orderStatus/:orderId",async function(req,res){
+    let order = await orderDataBase.findOne({_id:req.params.orderId});
+    res.render("orderStatus",{order:order});
 })
 
 
