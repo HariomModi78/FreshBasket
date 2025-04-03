@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheets/categary.css">
+</head>
+<body>
+    <main>
+        <div class="header">
+            <div class="input">
+                <img src="/images/search.png" alt="">
+            </div>
+            <!-- <img src="/images/sync.png" alt=""> -->
+        </div>
+        <div class="box">
+            <%product.forEach(function(val){%>
+                <div class="item" id="<%=val._id%>">
+                    <div class="itemImage">
+                        <img src="<%=val.imagePath%>" alt="">
+                    </div>
+                    <div class="name"><%=val.name%></div>
+                    <div class="quantity"><%=val.quantity%></div>
+                    <div class="price">₹<%=val.price%>/-</div>
+                </div>
+            <%})%>
+           
+            
+        </div>
+        <div class="fakeFooter"></div>
+        <div class="fakeFooter"></div>
+        <div class="footer">
+            <div class="footerBox home">
+                <img src="/images/home.png" alt="">
+                <p>Home</p>
+            </div>
+            <div class="footerBox seller">
+                <img src="/images/homeOrder.png" alt="">
+                <p>Order</p>
+            </div>
+            <div class="footerBox center cart">
+                <img src="/images/cart.gif" alt="">
+                <p>Cart</p>
+
+            </div>
+            <div class="footerBox feed">
+                <img src="/images/homeWallet.png" alt="">
+                <p>Wallet</p>
+            </div>
+            <div class="footerBox more">
+                <img src="/images/more.png" alt="">
+                <p>More</p>
+            </div>
+        </div>
+        
+    </main>
+    <script src="/javaScripts/nav.js"></script>
+    <script src="/javaScripts/categary.js"></script>
+    <script src="/javaScripts/loader.js"></script>
+</body>
+</html>
