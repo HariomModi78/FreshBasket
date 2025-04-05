@@ -18,6 +18,7 @@ const sellerDataBase = require("./models/seller.js");
 const productDataBase = require("./models/product.js");
 const transactionDataBase = require("./models/transaction.js");
 const orderDataBase = require("./models/order.js");
+const feedbackDataBase = require("./models/feedback.js");
 
 require('dotenv').config();
 
@@ -176,9 +177,9 @@ app.get("/home",async function(req,res){
     }
     
 })
-
-app.get("/feed",function(req,res){
-    res.render("feed");
+app.get("/feed",async function(req,res){
+    let product = await productDataBase.find({categary:"feed"});
+    res.render("feed",{product:product});
 })
 app.get("/more",async function(req,res){
     try{
@@ -242,14 +243,41 @@ app.get("/mySubscription",function(req,res){
 app.get("/support",function(req,res){
     res.render("support");
 }) 
-app.get("/cart",function(req,res){
-    res.render("cart");
+app.get("/cart",async function(req,res){
+    let user = await userDataBase.findOne({email:req.cookies.email});
+    let product = await productDataBase.find({_id:user.cart});
+    res.render("cart",{product:product});
 }) 
+app.get("/addToCart/:productId",async function(req,res){
+    let user  = await userDataBase.findOne({email:req.cookies.email});
+    let flag = true;
+        for(let i=0;i<user.cart.length;i++){
+            if(user.cart[i] == req.params.productId){
+                flag = false;
+            }
+        }
+        if(flag){
+            console.log("not working")
+            let product = await productDataBase.findOne({_id:req.params.productId});
+            await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+                $push:{cart:product._id}
+            });
+        }
+    
+    res.redirect(`/productView/${req.params.productId}`);
+})  
 app.get("/productView/:productId",async function(req,res){
     try{
         let product = await productDataBase.findOne({_id:req.params.productId})
         let products = await productDataBase.find();
-        res.render("productView",{product:product,products:products});
+        let user = await userDataBase.findOne({email:req.cookies.email});
+        let flag = false;
+        for(let i=0;i<user.cart.length;i++){
+            if(user.cart[i] == req.params.productId){
+                flag = true;
+            }
+        }
+        res.render("productView",{product:product,products:products,flag:flag});
     }catch(e){
         res.render("error")
     }
@@ -464,6 +492,9 @@ app.post("/admin/add/categary",async function(req,res){
     
  
 }) 
+app.get("/admin/order",function(req,res){
+    res.render("adminOrder");
+})
 app.post("/detail",async function(req,res){
     try{
         if(req.body.mobileNumber.length==10){
@@ -471,7 +502,12 @@ app.post("/detail",async function(req,res){
                 username:req.body.username,
                 mobileNumber:req.body.mobileNumber
             });
-            res.redirect("/home");
+            if(req.body.flag){
+                res.redirect("/profile")
+            }
+            else{
+                res.redirect("/home");
+            }
         }
         else{
             res.send("10 digit mobile number is required")
@@ -513,6 +549,31 @@ app.post("/orderAddress/placeOrder/:productId",async function(req,res){
     }
     
 }) 
+app.post("/changeAddress",async function(req,res){
+    try{
+        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            address:req.body.address
+        });
+       
+        res.redirect(`/profile`);
+    }catch(e){
+        res.render("error")
+    }
+    
+}) 
+app.post("/feedback",async function(req,res){
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email});
+       await feedbackDataBase.create({
+        userId:user._id,
+        feedback:req.body.feedback,
+       })
+        res.redirect(`/profile`);
+    }catch(e){
+        res.render("error")
+    }
+    
+}) 
 app.get("/orderAddress/:userId/:productId",async function(req,res){
     try{
         let user = await userDataBase.findOne({_id:req.params.userId});
@@ -540,34 +601,37 @@ app.get("/token/:email",function(req,res){
 
 app.get("/pay/:amount/:userId",async function(req,res){
     try{
-        let user = await userDataBase.findOne({_id:req.params.userId});
-        await userDataBase.findOneAndUpdate({_id:req.params.userId},{
-            walletBalance:(parseFloat(req.params.amount) + parseFloat(user.walletBalance)).toFixed(2)
-        })
-        await transactionDataBase.create({
-            userId:user._id,
-            amount:req.params.amount,
-            paymentMode:"Online",
-            utr:"12345679012",
-            status:"complete",
-            date:new Date(),
-            totalBalance:(parseFloat(user.walletBalance) +parseFloat(req.params.amount)).toFixed(2),
-            direction:"+"
-    
-        })
-        res.redirect("/wallet")
+        if(req.params.amount>0){
+            let user = await userDataBase.findOne({_id:req.params.userId});
+            await userDataBase.findOneAndUpdate({_id:req.params.userId},{
+                walletBalance:(parseFloat(req.params.amount) + parseFloat(user.walletBalance)).toFixed(2)
+            })
+            await transactionDataBase.create({
+                userId:user._id,
+                amount:req.params.amount,
+                paymentMode:"Online",
+                utr:"12345679012",
+                status:"complete",
+                date:new Date(),
+                totalBalance:(parseFloat(user.walletBalance) +parseFloat(req.params.amount)).toFixed(2),
+                direction:"+"
+        
+            })
+            res.redirect("/wallet")
+        }else{
+            res.render("error")
+
+        }
     }catch(e){
         res.render("error")
     }
     
 })
 app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
-    
-    
     try{
         let product =  await productDataBase.findOne({_id:req.params.productId});
         let user =  await userDataBase.findOne({email:req.cookies.email});
-        let amount = parseFloat((((product.price *parseInt(req.params.item) )+(((product.price *parseInt(req.params.item))*2)/100 )+(((((product.price *parseInt(req.params.item))*2)/100 ))*18)/100)).toFixed(2));
+        let amount =product.price *req.params.item;
        if(user.walletBalance>=(amount)){
         console.log("total AMount : ",amount)
         for(let i=0;i<parseInt(req.params.item);i++){
@@ -604,7 +668,7 @@ app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
         res.redirect(`/order`);
        }
        else{
-        res.send("insufficent balance");
+        res.render("error")
        }
         
     }catch(e){
@@ -616,7 +680,41 @@ app.get("/orderStatus/:orderId",async function(req,res){
     let order = await orderDataBase.findOne({_id:req.params.orderId});
     res.render("orderStatus",{order:order});
 })
-
+app.get("/change",async function(req,res){
+    await orderDataBase({},[
+        {buyingPrice:{$toDouble:"$buyingPrice"}}
+    ]);
+    res.send("done");
+})
+app.get("/cancelOrder/:orderId",async function(req,res){
+    let order = await orderDataBase.findOne({_id:req.params.orderId});
+    if(new Date().getTime() - new Date(order.date).getTime() < 60000 ){
+        let user  = await userDataBase.findOne({email:req.cookies.email});
+        await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            walletBalance:(user.walletBalance +order.buyingPrice).toFixed(2),
+        })
+        await orderDataBase.findOneAndUpdate({_id:req.params.orderId},{
+            orderStatus:"cancel"
+        });
+        await transactionDataBase.create({
+            userId:user._id,
+            amount:order.buyingPrice,
+            direction:"+",
+            paymentMode:"refund",
+            status:"complete",
+            date:new Date(),
+            totalBalance:(user.walletBalance +order.buyingPrice).toFixed(2),
+        })
+        res.redirect(`/orderStatus/${req.params.orderId}`);
+    }
+    else{
+        res.render("error");
+    }
+     
+})
+app.get("/search",function(req,res){
+    res.render("search");
+})
 
 io.on("connect",function(socket){
     console.log("connected")
@@ -625,5 +723,17 @@ io.on("connect",function(socket){
     })
     socket.on("disconnect",function(){
         console.log("disconnected");
+    })
+    socket.on("searchItem",async function(name){
+        // const regex = new RegExp("^" + name, "i"); // 'i' for case-insensitive
+        // console.log(regex)
+        let product = await productDataBase.find({ name: { $regex: `${name}` ,$options:`i` } });
+        if(product.length==0){
+            let product = await productDataBase.find({ categary: { $regex: `${name}` ,$options:`i` } });
+            socket.emit("searchResult", product);
+        }else{
+            console.log("mela");
+            socket.emit("searchResult", product);
+        }
     })
 })
