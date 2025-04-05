@@ -3,7 +3,8 @@ let input = document.querySelector("input");
 let button = document.querySelector(".button");
 let box = document.querySelector(".box");
 button.addEventListener("click",function(){
-    box.innerHTML = ""
+    box.innerText ="Loading..."
+
     if(input.value != ""){
         socket.emit("searchItem",input.value);
     }
@@ -11,6 +12,7 @@ button.addEventListener("click",function(){
 
 socket.on("searchResult",function(product){
     console.log(product);
+    box.innerHTML = ""
     for(let i=0;i<product.length;i++){
         let item = document.createElement("div");
         item.className = "item";
@@ -42,7 +44,7 @@ socket.on("searchResult",function(product){
         box.append(item)
     }
     let item = document.getElementsByClassName("item");
-    console.log(item[0])
+    console.log(item[0]);
     for(let i=0;i<item.length;i++){
         item[i].addEventListener("click",function(){
             window.location.href = `/productView/${item[i].id}`
