@@ -50,5 +50,9 @@ socket.on("searchResult",function(product){
             window.location.href = `/productView/${item[i].id}`
         })
     }
+    if(product.length ==0){
+        console.log("item not found")
+        box.innerText ="Item Not Found"
+    }
 })
 
