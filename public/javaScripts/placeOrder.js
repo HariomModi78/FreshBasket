@@ -10,10 +10,10 @@ let totalAmount = document.querySelector(".totalAmount");
 let originalPrice = parseFloat(totalAmount.innerText);
 let quantity = document.querySelector(".quantity");
 let price = document.querySelector(".pricejs");
+totalAmount.innerText = `${(quantity.value*originalPrice)+3}`
 quantity.addEventListener("input",function(){
     console.log(quantity.value);
-    socket.emit("quantityChange",quantity.value);
-    totalAmount.innerText = `${quantity.value*originalPrice}`
+    totalAmount.innerText = `${(quantity.value*originalPrice)+3}`
     localStorage.setItem("totalPrice",parseFloat(totalAmount.innerText));
     localStorage.setItem("item",quantity.value);
 })
