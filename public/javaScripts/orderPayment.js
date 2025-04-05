@@ -24,7 +24,7 @@ checkBox.addEventListener("click",function(){
             totalBalance.innerText =balanceOldValue;
             pay.innerText = payOldValue;
         }
-    
+     
     
 })
 
