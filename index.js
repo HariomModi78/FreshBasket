@@ -631,7 +631,7 @@ app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
     try{
         let product =  await productDataBase.findOne({_id:req.params.productId});
         let user =  await userDataBase.findOne({email:req.cookies.email});
-        let amount =product.price *req.params.item;
+        let amount =product.price *req.params.item +3;
        if(user.walletBalance>=(amount)){
         console.log("total AMount : ",amount)
         for(let i=0;i<parseInt(req.params.item);i++){
