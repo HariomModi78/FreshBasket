@@ -78,7 +78,7 @@ app.set("view engine","ejs");
 app.get("/",async function(req,res){
     try{
         let user = await userDataBase.findOne({email:req.cookies.email}); 
-        console.log(user.email);
+        //(user.email);
         if(req.cookies.otp){
      res.render("login");
         }
@@ -259,7 +259,7 @@ app.get("/addToCart/:productId",async function(req,res){
             }
         }
         if(flag){
-            console.log("not working")
+            //("not working")
             let product = await productDataBase.findOne({_id:req.params.productId});
             await userDataBase.findOneAndUpdate({email:req.cookies.email},{
                 $push:{cart:product._id},
@@ -297,7 +297,7 @@ app.get("/categary/:productName",async function(req,res){
 }) 
 function admin(email){
     if(email==process.env.email){
-        console.log(process.env.email)
+        //(process.env.email)
         return true;
     }
     else{
@@ -642,9 +642,9 @@ app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
         let amount =product.price *req.params.item +3;
         let otp = parseInt((Math.random()*9000)+1000);
        if(user.walletBalance>=(amount)){
-        console.log("total AMount : ",amount);
+        //("total AMount : ",amount);
         for(let i=0;i<parseInt(req.params.item);i++){
-            console.log("order done")
+            //("order done")
             await userDataBase.findOneAndUpdate({email:req.cookies.email},{
                 $push:{order:req.params.productId}
             })
@@ -745,7 +745,7 @@ app.get("/removeFromCart/:productId",async function(req,res){
     let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
         $pull:{cart:new mongoose.Types.ObjectId(req.params.productId)}
     })
-    console.log(req.params.productId," ",user.cart)
+    //(req.params.productId," ",user.cart)
     res.redirect("/cart");
 })
 app.get("/saveForLater/:productId",async function(req,res){
@@ -754,32 +754,171 @@ app.get("/saveForLater/:productId",async function(req,res){
         $pull:{cart:new mongoose.Types.ObjectId(req.params.productId)},
         $push:{saveForLater:new mongoose.Types.ObjectId(req.params.productId)}
     })
-    console.log(req.params.productId," ",user.cart)
+    //(req.params.productId," ",user.cart)
     res.redirect("/cart");
+})
+app.get("/placeCartOrder/:idArray/:itemArray",async function(req,res){
+    let productId = (req.params.idArray).split("-");
+    let item = (req.params.itemArray).split("-");
+    productId = productId.filter(function(val){
+        if(val !="undefined"){
+            return true;
+        }
+        else{
+            return false;
+        }
+    })
+    item = item.filter(function(val){
+        if(val !="undefined"){
+            return true;
+        }
+        else{
+            return false;
+        }
+    })
+    //(productId)
+    //(item)
+    let products  = await productDataBase.find({_id:productId});
+    let user = await userDataBase.findOne({email:req.cookies.email});
+    //(products);
+    let url1 = (req.params.idArray).replace("undefined","");
+     url1 = url1.replace("-","");
+     let url2 = (req.params.itemArray).replace("undefined","");
+     url2 = url2.replace("-","");
+    //(url1)
+    //(url2)
+    res.render("placeCartOrder",{product:products,user:user,url1:url1,url2:url2,item:item})
+})
+app.post("/cartOrderPayment/:idArray/:itemArray",async function(req,res){
+    let productId = (req.params.idArray).split("-");
+    let item = (req.params.itemArray).split("-");
+    productId = productId.filter(function(val){
+        if(val !="undefined"){
+            return true;
+        }
+        else{
+            return false;
+        }
+    })
+    item = item.filter(function(val){
+        if(val !="undefined"){
+            return true;
+        }
+        else{
+            return false;
+        }
+    })
+    let url1 = (req.params.idArray).replace("undefined","");
+     let url2 = (req.params.itemArray).replace("undefined","");
+    //(productId)
+    //(item)
+    let products  = await productDataBase.find({_id:productId});
+    let user = await userDataBase.findOne({email:req.cookies.email});
+    let amount = 0;
+    for(let i=0;i<products.length;i++){
+            amount += products[i].price * item[i];  
+    }
+    //(amount)
+    //(url1)
+    //(url2)
+    res.render("cartOrderConfirm",{user:user,url1:url1,url2:url2,amount:amount})
 })
 
 
+app.get("/cartOrderConfirm/:idArray/:itemArray",async function(req,res){
+    try{
+        //("Deisire output items :",req.params.itemArray);
+        //("Deisire output items :",req.params.idArray);
+        let productId = (req.params.idArray).split("-");
+        let item = (req.params.itemArray).split("-");
+        
+
+
+        let product =  await productDataBase.find({_id:productId});
+        let user =  await userDataBase.findOne({email:req.cookies.email});
+        let amount = 0;
+        for(let i=0;i<product.length;i++){
+                amount += product[i].price * item[i];  
+        }
+        let otp = parseInt((Math.random()*9000)+1000);
+       if(user.walletBalance>=(amount)){
+        //("total AMount : ",amount);
+
+        for(let i=0;i<product.length;i++){
+            for(let j=0;j<item[i];j++){
+                await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+                    $push:{order:product[i]._id}
+                })
+    
+            qrcode.toDataURL(`${otp}`,async function(err,url){ 
+                
+                         await orderDataBase.create({
+                        userId:user._id,
+                        productId:product[i]._id,
+                        date:new Date(),
+                        buyingPrice:product[i].price,
+                        paymentStatus:"paid",
+                        orderStatus:"order placed",
+                        name:product[i].name,
+                        quantity:product[i].quantity,
+                        imagePath:product[i].imagePath,
+                        otp:otp,
+                        qrUrl:url
+                    })
+            })
+            }
+        }
+
+        await transactionDataBase.create({
+            userId:user._id,
+            amount:(amount).toString(),
+            paymentMode:`wallet`,
+            utr:"12345679012",
+            status:"complete",
+            date:new Date(),
+            totalBalance:(parseFloat(user.walletBalance) -amount).toFixed(2),
+            direction:"-"
+        })
+        
+        await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            walletBalance:(parseFloat(user.walletBalance) -amount).toFixed(2)
+        })
+        res.redirect(`/order`);
+       }
+       else{
+        res.render("error")
+       }
+        
+    }catch(e){
+        res.render("error")
+    } 
+    
+})
+
 
 io.on("connect",function(socket){
-    console.log("connected");
+    //("connected");
     socket.on("cartOrder",function(product){
-        console.log(product);
+
+        //(product);
+        socket.emit("confirmOrder",product)
+        
     })
     socket.on("login",function(email){
         socket.emit("done");
     })
     socket.on("disconnect",function(){
-        console.log("disconnected");
+        //("disconnected");
     })
     socket.on("searchItem",async function(name){
         // const regex = new RegExp("^" + name, "i"); // 'i' for case-insensitive
-        // console.log(regex)
+        // //(regex)
         let product = await productDataBase.find({ name: { $regex: `${name}` ,$options:`i` } });
         if(product.length==0){
             let product = await productDataBase.find({ categary: { $regex: `${name}` ,$options:`i` } });
             socket.emit("searchResult", product);
         }else{
-            console.log("mela");
+            //("mela");
             socket.emit("searchResult", product);
         }
     })
