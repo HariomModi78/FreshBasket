@@ -67,6 +67,10 @@ main{
 }
 .red{
     background-color: rgb(253, 62, 62);
+    background-image: url(https://cdn-icons-png.flaticon.com/128/9199/9199686.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 .image{
     height: 100%;
@@ -130,7 +134,7 @@ main{
     border: 1px solid black;
 }
 .c1{
-    background-image: url(https://cdn-icons-png.flaticon.com/128/709/709510.png);
+    background-image: url(https://cdn-icons-png.flaticon.com/128/9249/9249233.png);
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -171,10 +175,7 @@ main{
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: url(https://cdn-icons-png.flaticon.com/128/9199/9199686.png);
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
+    
 }
 .note{
     padding: 1rem;
