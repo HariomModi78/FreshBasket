@@ -79,7 +79,7 @@ main{
     height:20rem;
     width: 95%;
     max-width: 25rem;
-
+    flex-shrink: 0;
     /* border: 1px solid black; */
     /* border-top-left-radius: 15px; */
     /* border-bottom-right-radius: 15px; */
@@ -119,6 +119,7 @@ main{
     align-items: center;
     overflow-y: auto;
     background-color: white;
+    flex-shrink: 0;
 }
 .categary{
     height: fit-content;
