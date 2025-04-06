@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const CookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
-
+const qrcode = require("qrcode");
 const http = require("http");
 const server = http.createServer(app);
 const socket = require("socket.io")
@@ -627,30 +627,45 @@ app.get("/pay/:amount/:userId",async function(req,res){
     }
     
 })
+app.get("/qr",function(req,res){
+    qrcode.toDataURL("chomu",function(err,url){
+        res.render("error",{url:url})
+    })
+})
 app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
     try{
         let product =  await productDataBase.findOne({_id:req.params.productId});
         let user =  await userDataBase.findOne({email:req.cookies.email});
         let amount =product.price *req.params.item +3;
+        let otp = parseInt((Math.random()*9000)+1000);
        if(user.walletBalance>=(amount)){
-        console.log("total AMount : ",amount)
+        console.log("total AMount : ",amount);
         for(let i=0;i<parseInt(req.params.item);i++){
             console.log("order done")
             await userDataBase.findOneAndUpdate({email:req.cookies.email},{
                 $push:{order:req.params.productId}
             })
-            await orderDataBase.create({
-                userId:user._id,
-                productId:product._id,
-                date:new Date(),
-                buyingPrice:product.price,
-                paymentStatus:"paid",
-                orderStatus:"order placed",
-                name:product.name,
-                quantity:product.quantity,
-                imagePath:product.imagePath
-            })
+
+        qrcode.toDataURL(`${otp}`,async function(err,url){ 
+            
+                     await orderDataBase.create({
+                    userId:user._id,
+                    productId:product._id,
+                    date:new Date(),
+                    buyingPrice:product.price,
+                    paymentStatus:"paid",
+                    orderStatus:"order placed",
+                    name:product.name,
+                    quantity:product.quantity,
+                    imagePath:product.imagePath,
+                    otp:otp,
+                    qrUrl:url
+                })
+        })
+                
+            
         }
+            
         await transactionDataBase.create({
             userId:user._id,
             amount:(amount).toString(),
@@ -714,6 +729,13 @@ app.get("/cancelOrder/:orderId",async function(req,res){
 })
 app.get("/search",function(req,res){
     res.render("search");
+})
+
+app.get("/deliveryBoyRegistration",function(req,res){
+    res.render("deliveryBoyRegistration");
+})
+app.post("/deliveryBoyRegistration",function(req,res){
+    res.send("Working")
 })
 
 io.on("connect",function(socket){
