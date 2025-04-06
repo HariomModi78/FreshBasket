@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hariom Milk</title>
+    <link rel="stylesheet" href="/stylesheets/placeOrder.css">
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+" crossorigin="anonymous"></script>
+    <style>
+        /* Fullscreen Loader */
+        #loader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Loader Animation */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ddd;
+            border-top: 5px solid blue;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+</head>
+<body>
+    <main>
+        <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+        <h2 class="header">Order Details</h2>
+        <div class="tracker">
+        <div class="diagram">
+            <div class="circle completed">1</div>
+            <div class="line"></div>
+            <div class="circle current">2</div>
+            <div class="line"></div>
+            <div class="circle">3</div>
+        </div>
+        <div class="stepName">
+            <div class="addressStep">Address</div>
+            <div class="orderDetailsStep">Order Details</div>
+            <div class="paymentStep">Payment</div>
+        </div>
+    </div>
+    <div class="address">
+        <div class="addressHeader">
+            <p>Delivery Address:</p>
+            <div class="addressChange" id="<%=user._id%>">Change</div>
+        </div>
+        <div class="userName">Hariom Modi</div>
+        <div class="addressText">
+            <%=user.address%>
+        </div>
+    </div>
+    <%product.forEach(function(val,index){%>
+        <div class="order" id="<%=val._id%>">
+            <div class="productImage">
+                <img src="<%=val.imagePath%>" alt="">
+                    <select name="" id="" class="quantity" >
+                        <option value="<%=item[index]%>"><%=item[index]%></option>
+                    </select>
+            </div>
+            <div class="detail">
+                <div class="name"><%=val.name%></div>
+                <div class="orderQuantity"><%=val.quantity%></div>
+                <div class="price">₹<div class="pricejs" ><%=val.price%></div>/-</div>
+                <div class="time">Delivery within 20 MIN <p>-Free Delivery</p></div>
+            </div>
+        </div>
+        <%})%>
+
+        <div class="priceDetail">
+            <div class="text">Price Details</div>
+            <!-- <div class="priceRow">
+                <p>Price(1 item) :</p>
+                <p>₹2</p>
+            </div> -->
+            <div class="priceRow">
+                <p>Platfrom Fee :</p>
+                <p>₹3</p>
+            </div>
+            <div class="priceRow">
+                <p>Delivery Fee :</p>
+                <p>Free Delivery</p>
+            </div>
+            <div class="totalPrice">
+                <p>Total amount :</p>
+                <div style="display: flex;">₹ <div class="amount">200</div> /-</div>
+            </div>
+        </div>  
+    
+        <div class="fakeFooter"></div>
+        <div class="footer" >
+            
+            <form action="/cartOrderPayment/<%=url1%>/<%=url2%>" method="post" >
+                <input type="hidden" name="" calss="items">
+                <input type="submit" value="Next Step"  class="confirmOrder" id="<%=product.id%>">
+            </form>
+       
+        </div>
+    </main>
+    <script src="/javaScripts/nav.js"></script>
+    <script src="/javaScripts/placeCartOrder.js"></script>
+    <script src="/javaScripts/loader.js"></script>
+</body>
+</html>
