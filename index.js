@@ -11,7 +11,7 @@ const http = require("http");
 const server = http.createServer(app);
 const socket = require("socket.io")
 const io = socket(server)
-
+const mongoose = require("mongoose")
 const userDataBase = require("./models/user.js");
 const categaryDataBase = require("./models/categary.js");
 const sellerDataBase = require("./models/seller.js");
@@ -19,6 +19,7 @@ const productDataBase = require("./models/product.js");
 const transactionDataBase = require("./models/transaction.js");
 const orderDataBase = require("./models/order.js");
 const feedbackDataBase = require("./models/feedback.js");
+const user = require("./models/user.js");
 
 require('dotenv').config();
 
@@ -246,7 +247,8 @@ app.get("/support",function(req,res){
 app.get("/cart",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email});
     let product = await productDataBase.find({_id:user.cart});
-    res.render("cart",{product:product});
+    let saveForLater = await productDataBase.find({_id:user.saveForLater});
+    res.render("cart",{product:product,saveForLater:saveForLater});
 }) 
 app.get("/addToCart/:productId",async function(req,res){
     let user  = await userDataBase.findOne({email:req.cookies.email});
@@ -260,11 +262,12 @@ app.get("/addToCart/:productId",async function(req,res){
             console.log("not working")
             let product = await productDataBase.findOne({_id:req.params.productId});
             await userDataBase.findOneAndUpdate({email:req.cookies.email},{
-                $push:{cart:product._id}
+                $push:{cart:product._id},
+                $pull:{saveForLater:new mongoose.Types.ObjectId(req.params.productId)},
             });
         }
-    
-    res.redirect(`/productView/${req.params.productId}`);
+       res.redirect("/cart");
+    // res.redirect(`/productView/${req.params.productId}`);
 })  
 app.get("/productView/:productId",async function(req,res){
     try{
@@ -737,9 +740,31 @@ app.get("/deliveryBoyRegistration",function(req,res){
 app.post("/deliveryBoyRegistration",function(req,res){
     res.send("Working")
 })
+app.get("/removeFromCart/:productId",async function(req,res){
+
+    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        $pull:{cart:new mongoose.Types.ObjectId(req.params.productId)}
+    })
+    console.log(req.params.productId," ",user.cart)
+    res.redirect("/cart");
+})
+app.get("/saveForLater/:productId",async function(req,res){
+
+    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        $pull:{cart:new mongoose.Types.ObjectId(req.params.productId)},
+        $push:{saveForLater:new mongoose.Types.ObjectId(req.params.productId)}
+    })
+    console.log(req.params.productId," ",user.cart)
+    res.redirect("/cart");
+})
+
+
 
 io.on("connect",function(socket){
-    console.log("connected")
+    console.log("connected");
+    socket.on("cartOrder",function(product){
+        console.log(product);
+    })
     socket.on("login",function(email){
         socket.emit("done");
     })
@@ -758,4 +783,5 @@ io.on("connect",function(socket){
             socket.emit("searchResult", product);
         }
     })
+    
 })
