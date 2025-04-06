@@ -22,7 +22,7 @@ body{
 }
 
 main{
-    height: 100%;
+    height: fit-content;
     width: fit-content;
     min-width: fit-content;
     min-height: fit-content;
