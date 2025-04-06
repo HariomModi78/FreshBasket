@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hariom Milk</title>
+    <link rel="stylesheet" href="/stylesheets/feed.css">
+</head>
+<body>
+    <main>
+        <div class="header">
+            <div class="input">
+                <img src="https://cdn-icons-png.flaticon.com/128/5636/5636698.png" alt="">
+            </div>
+            <!-- <img src="/images/sync.png" alt=""> -->
+        </div>
+        <div class="box">
+            <%product.forEach(function(val){%>
+                <div class="barItem item" id="<%=val._id%>">
+                    <div class="image image1">
+                        <img src="<%=val.imagePath%>" alt="Image">
+                    </div>
+                    <div class="itemName"><%=val.name%></div>
+                    <div class="price">
+                        <div class="realPrice">₹<%=val.price%>/-</div>
+                    </div>
+                    
+                    <div class="off">50Kg</div>
+                </div>
+            <%})%>
+            
+            
+        </div>
+        
+        <div class="fakeFooter"></div>
+        <div class="footer">
+            <div class="footerBox home" id="home">
+                <img src="https://cdn-icons-png.flaticon.com/128/263/263115.png" id="home" alt="">
+                <pid="home" >Home</p>
+            </div>
+            <div class="footerBox seller" id="order">
+                <img src="https://cdn-icons-png.flaticon.com/128/11458/11458660.png" id="order" alt="">
+                <p id="order">Order</p>
+            </div>
+            <div class="footerBox center cart" id="cart">
+                <img src="https://cdn-icons-gif.flaticon.com/6416/6416376.gif" id="cart" alt="">
+                <p id="cart">Cart</p>
+
+            </div>
+            <div class="footerBox feed" id="wallet">
+                <img src="https://cdn-icons-png.flaticon.com/128/869/869118.png" id="wallet" alt="">
+                <p id="wallet">Wallet</p>
+            </div>
+            <div class="footerBox more" id="more">
+                <img src="https://cdn-icons-png.flaticon.com/128/9091/9091427.png" id="more" alt="">
+                <p id="more">More</p>
+            </div>
+        </div>
+    </main>
+    <script src="/javaScripts/nav.js"></script>
+    <script src="/javaScripts/loader.js"></script>
+    <script src="/javaScripts/feed.js"></script>
+</body>
+</html>
