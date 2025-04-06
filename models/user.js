@@ -36,6 +36,7 @@ const userSchema = mongoose.Schema({
     doorPicture:String,
     order:Array,
     cart:Array,
+    saveForLater:Array,
     transaction:Array,
     type:{
         type:String,
