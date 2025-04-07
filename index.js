@@ -171,7 +171,7 @@ app.get("/home",async function(req,res){
              res.render("home",{user:user,categary:categary,product:product});
         }
         else{
-            res.send("Page Not Found")
+            res.send("Page Not Found but working");
         }
     }catch(e){
         res.render("error")
