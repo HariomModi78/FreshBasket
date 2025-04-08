@@ -43,10 +43,29 @@
       // silently ignore scan errors
     }
 
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader", { fps: 60, qrbox: 250 });
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices && devices.length) {
+        let backCamera = devices.find(device => device.label.toLowerCase().includes("back"))
+                       || devices[devices.length - 1]; // fallback to last if no label
 
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        const qrCodeScanner = new Html5Qrcode("reader");
+        qrCodeScanner.start(
+          backCamera.id,
+          {
+            fps: 10,
+            qrbox: 250
+          },
+          onScanSuccess,
+          onScanFailure
+        );
+      } else {
+        alert("No camera found");
+      }
+    }).catch(err => {
+      console.error(err);
+      alert("Camera error: " + err);
+    });
+
   </script>
 </body>
 </html>
