@@ -83,7 +83,7 @@ app.get("/",async function(req,res){
      res.render("login");
         }
         else{
-            res.redirect("/home")
+            res.render("login")
 
         }
     }catch(e){
@@ -165,6 +165,7 @@ app.get("/home",async function(req,res){
     try{
         if(req.cookies.email){
             let user =  await userDataBase.findOne({email:req.cookies.email});
+            console.log(user)
             let categary = await categaryDataBase.find();
             let product = await productDataBase.find();
             
@@ -712,7 +713,8 @@ app.get("/cancelOrder/:orderId",async function(req,res){
             walletBalance:(user.walletBalance +order.buyingPrice).toFixed(2),
         })
         await orderDataBase.findOneAndUpdate({_id:req.params.orderId},{
-            orderStatus:"cancel"
+            orderStatus:"cancel",
+            otp:"cancel"
         });
         await transactionDataBase.create({
             userId:user._id,
@@ -735,9 +737,18 @@ app.get("/search",function(req,res){
 })
 
 app.get("/deliveryBoyRegistration",function(req,res){
-    res.render("deliveryBoyRegistration");
+    res.redirect("/nearOrder")
+    // res.render("deliveryBoyRegistration");
 })
-app.post("/deliveryBoyRegistration",function(req,res){
+app.post("/deliveryBoyRegistration", upload.fields([
+    { name: 'aadharCard', maxCount: 1 },
+    { name: 'profileImage', maxCount: 1 }
+  ]),async function(req,res){
+    const file = req.file.path;
+    const cloudinaryResponce = await cloudinary.uploader.upload(file,{
+            
+        folder:"Documents"
+    })
     res.send("Working")
 })
 app.get("/removeFromCart/:productId",async function(req,res){
@@ -840,8 +851,9 @@ app.get("/cartOrderConfirm/:idArray/:itemArray",async function(req,res){
         for(let i=0;i<product.length;i++){
                 amount += product[i].price * item[i];  
         }
+        amount = amount + 3;
         let otp = parseInt((Math.random()*9000)+1000);
-       if(user.walletBalance>=(amount)){
+       if(user.walletBalance>=(amount)){ 
         //("total AMount : ",amount);
 
         for(let i=0;i<product.length;i++){
@@ -895,6 +907,34 @@ app.get("/cartOrderConfirm/:idArray/:itemArray",async function(req,res){
     
 })
 
+app.get("/nearOrder",async function(req,res){
+    let order = await orderDataBase.find({orderStatus:"order placed"});
+    order.sort((a, b) => a.userId.localeCompare(b.userId));
+    let user = new Array();
+
+    for(let i=0;i<order.length;i++){
+        user.push(await userDataBase.find({_id:order[i].userId}))
+    }
+    
+    res.render("nearOrder",{order:order,user:user});
+})
+app.get("/nearOrderDetail/:userId",async function(req,res){
+    let user = await userDataBase.findOne({_id:req.params.userId});
+    let order = await orderDataBase.find({orderStatus:"order placed",userId:req.params.userId});
+    order.sort((a, b) => a.name.localeCompare(b.name));
+    console.log(order)
+    res.render("nearOrderDetail",{order:order,user:user});
+})
+app.post("/openScanner",async function(req,res){
+    let user = await userDataBase.findOne({email:req.params.email});
+    res.render("scanner");
+})
+app.get("/confirmOrder/:otp",async function(req,res){
+    await orderDataBase.updateMany({otp:req.params.otp},{
+        orderStatus:"delivered"
+    })
+    res.redirect("/nearOrder");
+})
 
 io.on("connect",function(socket){
     //("connected");
