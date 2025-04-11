@@ -225,7 +225,7 @@ main{
 .itemName{
     padding-left: 0.5rem;
     width: 100%;
-    height: 3.5rem;
+    height: 2.7rem;
     border: 1px solid white;
     /* display: flex; */
     font-size: 0.7rem;
@@ -262,7 +262,7 @@ main{
 
 }
 .off{
-    color: green;
+    font-weight: 600;
 }
 .addToCart{
      display: none;
