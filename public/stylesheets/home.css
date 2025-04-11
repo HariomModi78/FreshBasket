@@ -159,7 +159,6 @@ main{
 @keyframes jump{
     50%{
         transform: translateY(-5rem);
-        border: 1px solid white;
         height: 4rem;
         width: 4rem;
     }
