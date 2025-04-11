@@ -240,21 +240,9 @@ main{
     color: green;
 }
 .addToCart{
-    height: 2.2rem;
-    width: 80%;
-    margin-top: 0.1rem;
-    border: 2px solid rgb(1, 65, 255);
-    border-radius: 4px;
-    font-weight: 600;
-    color: blue;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: none;
 }
-.addToCart:active{
-    background-color:rgb(1, 65, 255);
-    color: white;
-}
+
 
 .footer{
     height: 4.3rem;
