@@ -1,0 +1,224 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    user-select: none;
+    /* background-image: url(/images/cow.png);
+    background-position: center;
+    background-size: contain;
+    background-position: top ;
+    background-repeat: no-repeat;
+    background-position-y: 4rem; */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    overflow-x: hidden;
+
+}
+main{
+    height: 100%;
+    width: fit-content;
+    min-width: fit-content;
+    min-height: fit-content;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    /* background: linear-gradient( 145deg,rgb(0, 255, 255),rgba(0, 255, 255, 0.33),rgba(0, 255, 255, 0.42),rgba(0, 255, 255, 0.141),white,white,white); */
+    background-color: rgba(128, 128, 128, 0.053);
+    gap: 0.3rem;
+}
+.header{
+    height: 4.5rem;
+    max-width: 100vw;
+    width: 30rem;
+    /* border: 1px solid black; */
+    /* position: sticky;
+    top: 0; */
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    /* background-color: white; */
+    font-size: 1.5rem;
+} 
+.order{
+    height: 10rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    /* border: 1px solid black; */
+
+}
+.productImage{
+    height: 100%;
+    width: 5rem;
+    /* border: 1px solid black; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+.productImage img{
+    height: 60%;
+    width: 4.5rem;
+    /* border: 1px solid black; */
+}
+.quantity{
+    height: 2rem;
+    width: 4rem;
+    border: 1px solid black;
+    border-radius: 2px;
+    outline: none;
+}
+.detail{
+    height: 100%;
+    width: fit-content;
+    /* border: 1px solid black; */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding-left: 0.3rem;
+}
+.name,.price,.orderQuantity,.time{
+    height: 2rem;
+    width: fit-content;
+    /* border: 1px solid black; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.name{
+    align-items: flex-start;
+    overflow: auto;
+    scrollbar-width: none;
+}
+.time{
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0.7;
+
+}
+.priceDetail{
+    height: 11rem;
+    width: 100%;
+    background-color: white;
+}
+.orderHeader{
+    height: 80%;
+    width: 100%;
+    display: flex;
+    padding: 0.5rem;
+    background-color: white;
+    /* border: 1px solid black; */
+}
+.orderFooter{
+    height: 20%;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    background-color: white;
+    /* border: 1px solid black; */
+}
+.remove,.saveForLater,.buy,.addToCart{
+    height: 100%;
+    width: calc(100%/3);
+    border: 1px solid rgba(0, 0, 0, 0.163);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: all linear 350ms;
+}
+.remove:focus,.saveForLater:focus,.buy:focus,.addToCart:focus{
+    background-color: rgba(128, 128, 128, 0.418);
+}
+form{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    max-width: 30rem;
+    background-color: white;
+    height: 3rem;
+}
+.confirmOrder{
+    height: 2.5rem;
+    width: 8rem;
+    border: 1px solid rgba(0, 0, 0, 0.328);
+    background-color: rgb(21, 102, 241);
+    border-radius: 4px;
+    color:white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    transition: all linear 350ms;
+}
+.confirmOrder:focus{
+    background-color: rgba(128, 128, 128, 0.418);
+}
+.lastAmount{
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.footer{
+    height: 4.5rem;
+    max-width: 100vw;
+    width: 30rem;
+    /* border: 1px solid black; */
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    background-color: white;
+
+}
+.footerBox{
+    height: 100%;
+    width: 7rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-wrap: wrap;
+    text-align: center;
+    font-size: 0.8rem;
+    /* border-top: 1px solid black; */
+    transition: all linear 300ms;
+}
+.footerBox:focus{
+    background-color: gray;
+}
+.center{
+    border-radius: 50%;
+    /* border: 1px solid black; */
+    bottom: 2rem;
+    position: relative;
+    background-color: white;
+    /* background-color: rgba(0, 255, 255, 0.744); */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.39),inset 0 0 10px rgba(218, 218, 218, 0.226);
+}
+.center img{
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+    mix-blend-mode: multiply;
+    
+
+}
+.footerBox img{
+    height: 1.6rem;
+    width: 1.6rem;
+}
+.seller img{
+    height: 1.9rem;
+    width: 1.9rem;
+}
+.fakeFooter{
+    height: 5rem;
+    width: 100%;
+}
