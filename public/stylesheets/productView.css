@@ -154,7 +154,7 @@ main{
 }
 .item:hover img{
     background-color: rgba(128, 128, 128, 0.623);
-    animation: motion linear 1s infinite;
+    animation: motion linear 1.5s forwards;
 } 
 @keyframes motion{
     100%{
