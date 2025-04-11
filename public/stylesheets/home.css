@@ -149,10 +149,28 @@ main{
     align-items: center;
     flex-direction: column;
     font-weight: 500;
-    transition: all linear 350ms;
 }
-.categaryBox:active{
-   border: 1px solid transparent;
+.categaryBox:hover img{
+    animation: jump 2s alternate 1 ease-out;
+}
+.categaryBox:hover{
+    animation: line 2s alternate 1 ease-in-out;
+}
+@keyframes jump{
+    50%{
+        transform: translateY(-5rem);
+        border: 1px solid white;
+        height: 4rem;
+        width: 4rem;
+    }
+    100%{
+        transform: translateY(0rem);
+    }
+}
+@keyframes line{
+    50%{
+        border: 1px solid white;
+    }
 }
 .categaryBox img{ 
     height: 3rem;
