@@ -103,10 +103,13 @@ main{
     height: 60%;
     width: 100%;
     border: 1px solid rgba(0, 0, 0, 0.194);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .itemImage img{
-    height: 100%;
-    width: 100%;
+    height: 80%;
+    width: 75%;
 }
 .name,.quantity,.price{
     height: 2rem;
