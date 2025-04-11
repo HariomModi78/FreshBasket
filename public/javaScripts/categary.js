@@ -9,3 +9,9 @@ window.addEventListener("load", function() {
     document.getElementById("loader").style.display = "none";
     document.getElementById("content").style.display = "block";
 });
+
+let input = document.querySelector(".input");
+
+input.addEventListener("click",function(){
+    window.location.href = "/search"
+})
