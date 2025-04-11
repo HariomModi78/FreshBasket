@@ -115,6 +115,11 @@ main{
     padding-left: 0.3rem;
     overflow: hidden;
     font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+}
+.name{
+    align-items: flex-start;
 }
 .price{
     font-size: 0.8rem;
