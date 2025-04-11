@@ -84,7 +84,12 @@ input{
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.419);
     border-radius: 3px;
     overflow: hidden;
+    transition: all linear 1s;
 }
+.item:active{
+    background-color: rgba(128, 128, 128, 0.623);
+    transform: rotateY(360deg);
+} 
 .image{
     height: 50%;
     width: 100%;
