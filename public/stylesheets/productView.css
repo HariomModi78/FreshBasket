@@ -151,12 +151,16 @@ main{
     flex-direction: column;
     flex-shrink: 0;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.419);
-    transition: all linear 1s;
 }
-.item:active{
+.item:hover img{
     background-color: rgba(128, 128, 128, 0.623);
-    transform: rotateY(360deg);
+    animation: motion linear 1s forwards;
 } 
+@keyframes motion{
+    100%{
+        transform: rotateY(360deg);
+    }
+}
 .itemImage{
     height: 60%;
     width: 100%;
