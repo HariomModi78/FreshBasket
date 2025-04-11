@@ -1,6 +1,6 @@
 {
-    "name": "Hariom Milk",
-    "short_name": "DairyApp",
+    "name": "Grocery Market",
+    "short_name": "Grocery Market",
     "start_url": "/",
     "scope": "/",
     "display": "standalone",
