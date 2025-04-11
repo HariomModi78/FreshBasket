@@ -86,10 +86,16 @@ input{
     overflow: hidden;
     transition: all linear 1s;
 }
-.item:active{
+.item:hover img{
     background-color: rgba(128, 128, 128, 0.623);
-    transform: rotateY(360deg);
+    animation: motion linear 1.5s forwards ;
+    animation-iteration-count: 2;
 } 
+@keyframes motion{
+    100%{
+        transform: rotateY(360deg);
+    }
+}
 .image{
     height: 55%;
     width: 100%;
