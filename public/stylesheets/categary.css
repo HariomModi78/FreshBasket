@@ -88,10 +88,15 @@ main{
     overflow: hidden;
     transition: all linear 1s;
 }
-.item:active{
+.item:hover img{
     background-color: rgba(128, 128, 128, 0.623);
-    transform: rotateY(360deg);
+    animation: motion linear 1s forwards;
 } 
+@keyframes motion{
+    100%{
+        transform: rotateY(360deg);
+    }
+}
 
 .itemImage{
     height: 50%;
@@ -140,7 +145,7 @@ main{
     text-align: center;
     font-size: 0.8rem;
     /* border-top: 1px solid black; */
-    transition: all linear 300ms;
+     transition: all linear 10ms;
 }
 .footerBox:active{
     background-color: gray;
