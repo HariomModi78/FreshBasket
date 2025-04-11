@@ -182,12 +182,14 @@ main{
 }
 .name,.quantity,.price{
     height: 2rem;
+    overflow: hidden;
     width: 100%;
     /* border: 1px solid black; */
     padding-left: 0.3rem;
     font-size: 0.8rem;
     display: flex;
     align-items: center;
+    align-items: flex-start;
 }
 .button{
     height: 4.5rem;
