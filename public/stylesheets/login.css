@@ -49,6 +49,15 @@ form{
     height: 100%;
     width: 100%;
 }
+.motion{
+    animation: motion 1s reverse forwards 3;
+
+}
+@keyframes motion{
+    100%{
+        transform: translateY(1rem);
+    }
+}
 input[type="email"]{
     height: 2.5rem;
     width: 16rem;
