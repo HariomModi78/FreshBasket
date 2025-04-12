@@ -90,9 +90,6 @@ app.get("/",async function(req,res){
     res.render("login");
     }
 }) 
-// app.get("/",function(req,res){
-//     res.render("feed");
-// })
 app.post("/otp",function(req,res){
     let otp = parseInt((Math.random()*9000)+1000);
     
@@ -113,9 +110,12 @@ app.post("/verify",async function(req,res){
                 await userDataBase.create({
                     email:req.cookies.email
                 })
+            res.render("pin",{work:"Create",url:"createPin"});
+
+            }else{
+                res.render("pin",{work:"Enter",url:"verifyPin"});
             }
             
-            res.redirect("/home");
         }
         else{
             res.send("invalid otp")
@@ -124,6 +124,23 @@ app.post("/verify",async function(req,res){
         res.render("error")
     }
     
+})
+app.post("/verifyPin",async function(req,res){
+    let pin = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
+    let user = await userDataBase.findOne({email:req.cookies.email});
+    if(user.pin == pin){
+        res.redirect("/home")
+    }
+    else{
+        res.send("Login Failed")
+    }
+})
+app.post("/createPin",async function(req,res){
+    let pin = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
+    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        pin:pin
+    });
+    res.redirect("/home")
 })
 app.get("/sellerSignup",async function(req,res){
     try{
@@ -934,6 +951,10 @@ app.get("/confirmOrder/:otp",async function(req,res){
         orderStatus:"delivered"
     })
     res.redirect("/nearOrder");
+})
+
+app.get("/pin",async function(req,res){
+    res.render("pin",{work:"Enter",url:"verifyPin"});
 })
 
 io.on("connect",function(socket){
