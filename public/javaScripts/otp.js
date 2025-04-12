@@ -3,6 +3,9 @@ let two = document.querySelector(".two");
 let three = document.querySelector(".three");
 let four = document.querySelector(".four");
 let otp = document.querySelector(".submitOtp")
+let icon = document.querySelector(".logo")
+let form = document.querySelector("form")
+
 one.addEventListener("input",function(){
         two.focus();
 })
@@ -15,6 +18,9 @@ three.addEventListener("input",function(){
 four.addEventListener("input",function(){
         otp.focus();
         otp.style.cssText = "background-color:green"
+})
+form.addEventListener("submit",function(){
+        icon.classList = "motion logo"
 })
 
 
