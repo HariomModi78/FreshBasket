@@ -43,7 +43,8 @@ main{
     /* border: 1px solid black; */
     position: sticky;
     top: 0;
-    background:linear-gradient(105deg,rgb(0, 132, 255),rgb(0, 132, 255),rgb(7, 170, 235));
+    background-color: rgb(59, 58, 58);
+    /* background:linear-gradient(105deg,rgb(0, 132, 255),rgb(0, 132, 255),rgb(7, 170, 235)); */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -141,14 +142,15 @@ main{
     height: 5rem;
     width: 100vw;
     max-width: 28rem;
-    border:1px solid black;
+    border:1px solid rgba(0, 0, 0, 0.102);
+    z-index: -1;
     display: flex;
     justify-content: space-evenly;
 }
 .optionBox{
     height: 4rem;
     width: 90%;
-    border:1px solid black;
+    border:1px solid rgba(0, 0, 0, 0.102);
     display: flex;
     /* justify-content: space-evenly; */
     align-items: center;
