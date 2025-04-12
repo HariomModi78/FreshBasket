@@ -77,8 +77,7 @@ app.set("view engine","ejs");
 
 app.get("/",async function(req,res){
     try{
-        let user = await userDataBase.findOne({email:req.cookies.email}); 
-        //(user.email);
+        let user = await userDataBase.findOne({email:req.cookies.email1}); 
         if(req.cookies.otp){
      res.render("login");
         }
@@ -102,6 +101,7 @@ app.post("/otp",function(req,res){
 })
 app.post("/verify",async function(req,res){
     try{
+        
         let data = jwt.verify(req.cookies.otp,process.env.SECRET);
         let otp = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
         if(otp==data.otp){
@@ -113,7 +113,14 @@ app.post("/verify",async function(req,res){
             res.render("pin",{work:"Create",url:"createPin"});
 
             }else{
-                res.render("pin",{work:"Enter",url:"verifyPin"});
+                let user = await userDataBase.findOne({email:req.cookies.email});
+                if(user.pin){
+                    res.render("pin",{work:"Enter",url:"verifyPin"});
+                }
+                else{
+                    res.render("pin",{work:"Create",url:"createPin"});
+            
+                }
             }
             
         }
@@ -126,25 +133,31 @@ app.post("/verify",async function(req,res){
     
 })
 app.post("/verifyPin",async function(req,res){
-    let pin = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
-    let user = await userDataBase.findOne({email:req.cookies.email});
-    if(user.pin == pin){
-        res.redirect("/home")
+    try{
+        let pin = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
+        let user = await userDataBase.findOne({email:req.cookies.email});
+        if(user.pin == pin){
+            res.cookie("email1",req.cookies.email);
+            res.redirect("/home")
+        }
+        else{
+            res.send("Login Failed")
+        }
+    }catch(e){
+        res.send("Login Failed");
     }
-    else{
-        res.send("Login Failed")
-    }
+   
 })
 app.post("/createPin",async function(req,res){
     let pin = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
-    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
         pin:pin
     });
     res.redirect("/home")
 })
 app.get("/sellerSignup",async function(req,res){
     try{
-        let user = await userDataBase.findOne({email:req.cookies.email});
+        let user = await userDataBase.findOne({email:req.cookies.email1});
         if(user.type =="farmer"){
             res.render("sellerPage",{user:user});
         }
@@ -164,7 +177,7 @@ app.post("/sellerSignup1",upload.single("image"),async function(req,res){
                 
             folder:"Uploads"
         })
-        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
             type:"farmer",
             address:req.body.address,
             profilePicture:cloudinaryResponce.url
@@ -180,8 +193,8 @@ app.post("/sellerSignup1",upload.single("image"),async function(req,res){
 })
 app.get("/home",async function(req,res){
     try{
-        if(req.cookies.email){
-            let user =  await userDataBase.findOne({email:req.cookies.email});
+        if(req.cookies.email1){
+            let user =  await userDataBase.findOne({email:req.cookies.email1});
             console.log(user)
             let categary = await categaryDataBase.find();
             let product = await productDataBase.find();
@@ -202,7 +215,7 @@ app.get("/feed",async function(req,res){
 })
 app.get("/more",async function(req,res){
     try{
-        let user =  await userDataBase.findOne({email:req.cookies.email});
+        let user =  await userDataBase.findOne({email:req.cookies.email1});
         res.render("more",{user:user});
     }catch(e){
         res.render("error")
@@ -217,7 +230,7 @@ app.get("/refer",function(req,res){
 })
 app.get("/wallet",async function(req,res){
     try{
-        let user = await userDataBase.findOne({email:req.cookies.email});
+        let user = await userDataBase.findOne({email:req.cookies.email1});
         res.render("wallet",{user:user});
     }catch(e){
         res.render("error")
@@ -226,7 +239,7 @@ app.get("/wallet",async function(req,res){
 })
 app.get("/transaction",async function(req,res){
     try{
-        let user = await userDataBase.findOne({email:req.cookies.email});
+        let user = await userDataBase.findOne({email:req.cookies.email1});
     let transaction = await transactionDataBase.find({userId:user._id}).sort({date: -1 });
     res.render("transaction",{user:user,transaction:transaction});
     }catch(e){
@@ -236,7 +249,7 @@ app.get("/transaction",async function(req,res){
 })
 app.get("/profile",async function(req,res){
     try{
-        let user =  await userDataBase.findOne({email:req.cookies.email});
+        let user =  await userDataBase.findOne({email:req.cookies.email1});
         res.render("profile",{user:user});
     }catch(e){
         res.render("error")
@@ -248,7 +261,7 @@ app.get("/subscription",function(req,res){
 })
 app.get("/order",async function(req,res){
     try{
-        let user = await userDataBase.findOne({email:req.cookies.email});
+        let user = await userDataBase.findOne({email:req.cookies.email1});
         let order = await orderDataBase.find({userId:user._id}).sort({date: -1 });
         res.render("order",{order:order});
     }catch(e){
@@ -263,13 +276,13 @@ app.get("/support",function(req,res){
     res.render("support");
 }) 
 app.get("/cart",async function(req,res){
-    let user = await userDataBase.findOne({email:req.cookies.email});
+    let user = await userDataBase.findOne({email:req.cookies.email1});
     let product = await productDataBase.find({_id:user.cart});
     let saveForLater = await productDataBase.find({_id:user.saveForLater});
     res.render("cart",{product:product,saveForLater:saveForLater});
 }) 
 app.get("/addToCart/:productId",async function(req,res){
-    let user  = await userDataBase.findOne({email:req.cookies.email});
+    let user  = await userDataBase.findOne({email:req.cookies.email1});
     let flag = true;
         for(let i=0;i<user.cart.length;i++){
             if(user.cart[i] == req.params.productId){
@@ -279,7 +292,7 @@ app.get("/addToCart/:productId",async function(req,res){
         if(flag){
             //("not working")
             let product = await productDataBase.findOne({_id:req.params.productId});
-            await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
                 $push:{cart:product._id},
                 $pull:{saveForLater:new mongoose.Types.ObjectId(req.params.productId)},
             });
@@ -291,7 +304,7 @@ app.get("/productView/:productId",async function(req,res){
     try{
         let product = await productDataBase.findOne({_id:req.params.productId})
         let products = await productDataBase.find();
-        let user = await userDataBase.findOne({email:req.cookies.email});
+        let user = await userDataBase.findOne({email:req.cookies.email1});
         let flag = false;
         for(let i=0;i<user.cart.length;i++){
             if(user.cart[i] == req.params.productId){
@@ -324,7 +337,7 @@ function admin(email){
 }
 app.get("/admin/product",async function(req,res){
     try{
-        if(admin(req.cookies.email)){
+        if(admin(req.cookies.email1)){
             //.log("admin is watching")
              let categary = await categaryDataBase.find();
     
@@ -339,7 +352,7 @@ app.get("/admin/product",async function(req,res){
     
 }) 
 app.get("/admin/user",function(req,res){
-    if(admin(req.cookies.email)){
+    if(admin(req.cookies.email1)){
         //.log("admin is watching")
         res.render("adminUser");
     }
@@ -348,7 +361,7 @@ app.get("/admin/user",function(req,res){
     } 
 }) 
 app.get("/admin/add/categary",function(req,res){
-    if(admin(req.cookies.email)){
+    if(admin(req.cookies.email1)){
         //.log("admin is watching")
         res.render("adminAddCategary");
     }
@@ -359,7 +372,7 @@ app.get("/admin/add/categary",function(req,res){
 app.get("/admin/categary/update/:categary",async function(req,res){
     try{
 
-    if(admin(req.cookies.email)){
+    if(admin(req.cookies.email1)){
         //.log("admin is watching");
             let product = await productDataBase.find();
             let categary = await categaryDataBase.findOne({name:req.params.categary})
@@ -377,7 +390,7 @@ app.get("/admin/categary/update/:categary",async function(req,res){
 app.get("/admin/add/product/:categary",async function(req,res){
     try{
 
-    if(admin(req.cookies.email)){
+    if(admin(req.cookies.email1)){
             let categary = await categaryDataBase.findOne({name:req.params.categary})
             res.render("adminAddProduct",{categary:categary})
        
@@ -437,7 +450,7 @@ app.post("/admin/updateProduct/:productId",async function(req,res){
 })
 app.get("/admin/user/:user",async function(req,res){
     try{
-        if(admin(req.cookies.email)){
+        if(admin(req.cookies.email1)){
             //.log("admin is watching");
             if(req.params.user == "user"){
                 try{
@@ -469,7 +482,7 @@ app.get("/admin/user/:user",async function(req,res){
 })
 app.post("/admin/categary/update/:categary",async function(req,res){
     try{
-        if(admin(req.cookies.email)){
+        if(admin(req.cookies.email1)){
             //.log("admin is watching");
             if(req.body.delete == req.body.name){
                 try{
@@ -519,7 +532,7 @@ app.get("/admin/order",function(req,res){
 app.post("/detail",async function(req,res){
     try{
         if(req.body.mobileNumber.length==10){
-            let user =  await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            let user =  await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
                 username:req.body.username,
                 mobileNumber:req.body.mobileNumber
             });
@@ -550,7 +563,7 @@ app.get("/logout",function(req,res){
 
 app.get("/placeOrder/:productId",async function(req,res){
     try{
-        let user = await userDataBase.findOne({email:req.cookies.email});
+        let user = await userDataBase.findOne({email:req.cookies.email1});
         let product = await productDataBase.findOne({_id:req.params.productId});
         res.render("placeOrder",{product:product,user:user});
     }catch(e){
@@ -560,7 +573,7 @@ app.get("/placeOrder/:productId",async function(req,res){
 })   
 app.post("/orderAddress/placeOrder/:productId",async function(req,res){
     try{
-        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
             address:req.body.address
         });
         let product = await productDataBase.findOne({_id:req.params.productId});
@@ -572,7 +585,7 @@ app.post("/orderAddress/placeOrder/:productId",async function(req,res){
 }) 
 app.post("/changeAddress",async function(req,res){
     try{
-        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
             address:req.body.address
         });
        
@@ -584,7 +597,7 @@ app.post("/changeAddress",async function(req,res){
 }) 
 app.post("/feedback",async function(req,res){
     try{
-        let user = await userDataBase.findOne({email:req.cookies.email});
+        let user = await userDataBase.findOne({email:req.cookies.email1});
        await feedbackDataBase.create({
         userId:user._id,
         feedback:req.body.feedback,
@@ -607,7 +620,7 @@ app.get("/orderAddress/:userId/:productId",async function(req,res){
 }) 
 app.post("/orderPayment/:productId",async function(req,res){
     try{
-        let user = await userDataBase.findOne({email:req.cookies.email});
+        let user = await userDataBase.findOne({email:req.cookies.email1});
         let product  = await productDataBase.findOne({_id:req.params.productId});
         res.render("orderPayment",{user:user,product:product})
     }catch(e){
@@ -617,7 +630,7 @@ app.post("/orderPayment/:productId",async function(req,res){
 })   
 app.get("/token/:email",function(req,res){
     res.cookie("email",req.params.email);
-    res.redirect("/home");
+    res.redirect("/pin");
 })
 
 app.get("/pay/:amount/:userId",async function(req,res){
@@ -656,14 +669,14 @@ app.get("/qr",function(req,res){
 app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
     try{
         let product =  await productDataBase.findOne({_id:req.params.productId});
-        let user =  await userDataBase.findOne({email:req.cookies.email});
+        let user =  await userDataBase.findOne({email:req.cookies.email1});
         let amount =product.price *req.params.item +3;
         let otp = parseInt((Math.random()*9000)+1000);
        if(user.walletBalance>=(amount)){
         //("total AMount : ",amount);
         for(let i=0;i<parseInt(req.params.item);i++){
             //("order done")
-            await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+            await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
                 $push:{order:req.params.productId}
             })
 
@@ -698,7 +711,7 @@ app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
             direction:"-"
         })
         
-        await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
             walletBalance:(parseFloat(user.walletBalance) -amount).toFixed(2)
         })
         res.redirect(`/order`);
@@ -725,8 +738,8 @@ app.get("/change",async function(req,res){
 app.get("/cancelOrder/:orderId",async function(req,res){
     let order = await orderDataBase.findOne({_id:req.params.orderId});
     if(new Date().getTime() - new Date(order.date).getTime() < 60000 ){
-        let user  = await userDataBase.findOne({email:req.cookies.email});
-        await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        let user  = await userDataBase.findOne({email:req.cookies.email1});
+        await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
             walletBalance:(user.walletBalance +order.buyingPrice).toFixed(2),
         })
         await orderDataBase.findOneAndUpdate({_id:req.params.orderId},{
@@ -770,7 +783,7 @@ app.post("/deliveryBoyRegistration", upload.fields([
 })
 app.get("/removeFromCart/:productId",async function(req,res){
 
-    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
         $pull:{cart:new mongoose.Types.ObjectId(req.params.productId)}
     })
     //(req.params.productId," ",user.cart)
@@ -778,7 +791,7 @@ app.get("/removeFromCart/:productId",async function(req,res){
 })
 app.get("/saveForLater/:productId",async function(req,res){
 
-    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
         $pull:{cart:new mongoose.Types.ObjectId(req.params.productId)},
         $push:{saveForLater:new mongoose.Types.ObjectId(req.params.productId)}
     })
@@ -807,7 +820,7 @@ app.get("/placeCartOrder/:idArray/:itemArray",async function(req,res){
     //(productId)
     //(item)
     let products  = await productDataBase.find({_id:productId});
-    let user = await userDataBase.findOne({email:req.cookies.email});
+    let user = await userDataBase.findOne({email:req.cookies.email1});
     //(products);
     let url1 = (req.params.idArray).replace("undefined","");
      url1 = url1.replace("-","");
@@ -841,7 +854,7 @@ app.post("/cartOrderPayment/:idArray/:itemArray",async function(req,res){
     //(productId)
     //(item)
     let products  = await productDataBase.find({_id:productId});
-    let user = await userDataBase.findOne({email:req.cookies.email});
+    let user = await userDataBase.findOne({email:req.cookies.email1});
     let amount = 0;
     for(let i=0;i<products.length;i++){
             amount += products[i].price * item[i];  
@@ -863,7 +876,7 @@ app.get("/cartOrderConfirm/:idArray/:itemArray",async function(req,res){
 
 
         let product =  await productDataBase.find({_id:productId});
-        let user =  await userDataBase.findOne({email:req.cookies.email});
+        let user =  await userDataBase.findOne({email:req.cookies.email1});
         let amount = 0;
         for(let i=0;i<product.length;i++){
                 amount += product[i].price * item[i];  
@@ -875,7 +888,7 @@ app.get("/cartOrderConfirm/:idArray/:itemArray",async function(req,res){
 
         for(let i=0;i<product.length;i++){
             for(let j=0;j<item[i];j++){
-                await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+                await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
                     $push:{order:product[i]._id}
                 })
     
@@ -909,7 +922,7 @@ app.get("/cartOrderConfirm/:idArray/:itemArray",async function(req,res){
             direction:"-"
         })
         
-        await userDataBase.findOneAndUpdate({email:req.cookies.email},{
+        await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
             walletBalance:(parseFloat(user.walletBalance) -amount).toFixed(2)
         })
         res.redirect(`/order`);
@@ -954,7 +967,19 @@ app.get("/confirmOrder/:otp",async function(req,res){
 })
 
 app.get("/pin",async function(req,res){
-    res.render("pin",{work:"Enter",url:"verifyPin"});
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email});
+        if(user.pin){
+            res.render("pin",{work:"Enter",url:"verifyPin"});
+        }
+        else{
+            res.render("pin",{work:"Create",url:"createPin"});
+    
+        }
+    }catch(e){
+        res.render("error");
+    }
+    
 })
 
 io.on("connect",function(socket){
@@ -965,9 +990,7 @@ io.on("connect",function(socket){
         socket.emit("confirmOrder",product)
         
     })
-    socket.on("login",function(email){
-        socket.emit("done");
-    })
+    
     socket.on("disconnect",function(){
         //("disconnected");
     })
