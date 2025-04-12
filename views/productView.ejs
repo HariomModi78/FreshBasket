@@ -51,7 +51,7 @@
             
             
         </div>
-        <div class="image">
+        <div class="image1">
             <img src="<%=product.imagePath%>" alt="">
         </div>
         <div class="imageBottom">
@@ -72,17 +72,24 @@
             <p><%=product.discription%></p>
         </div>
         <p class="relatedItem">Related items</p>
-        <div class="bar">
+        <div class="bar"> 
            <% products.forEach(function(val){%>
             <%if(val.categary==product.categary){%>
-                <div class="item" id="<%=val._id%>">
-                    <div class="itemImage">
-                        <img src="<%=val.imagePath%>" alt="">
+                <div class="barItem item" id="<%=val._id%>">
+                    <div class="image image1">
+                        <img src="<%=val.imagePath%>" alt="Image">
                     </div>
-                    <div class="name"><%=val.name%></div>
+                    <div class="itemName"><%=val.name%></div>
                     <div class="off"><%=val.quantity%></div>
-                    <div class="price">₹<%=val.price%>/-</div>
-                </div>
+
+                    <div class="price">
+                     
+                        <div class="realPrice">₹<%=val.price%>/-</div>
+                    </div>
+                    
+                   
+                    <div class="addToCart1">View</div>
+            </div>
             <%}%>
                 
             <%})%>
