@@ -14,34 +14,35 @@ socket.on("searchResult",function(product){
     console.log(product);
     box.innerHTML = ""
     for(let i=0;i<product.length;i++){
+         
         let item = document.createElement("div");
-        item.className = "item";
+        item.className = "barItem";
         item.id = product[i]._id;
         let image = document.createElement("div");
-        image.className = "image";
-        let detail = document.createElement("div");
-        detail.className = "detail";
+        image.classList = "image image1";
         let img = document.createElement("img");
         img.src = product[i].imagePath;
         console.log("Working",i)
         let name = document.createElement("div");
-        name.className = "name";
+        name.className = "itemName";
         name.innerText = product[i].name;
         let quantity = document.createElement("div");
-        quantity.className = "quantity";
+        quantity.className = "off";
         quantity.innerText = product[i].quantity;
         let price = document.createElement("div");
         price.className = "price";
-        price.innerText =`₹${product[i].price}/-`;
+        let realPrice = document.createElement("div");
+        realPrice.className = "realPrice";
+        realPrice.innerText =`₹${product[i].price}/-`;
 
         item.appendChild(image);
         image.appendChild(img)
-        item.appendChild(detail);
-        detail.appendChild(name);
-        detail.appendChild(quantity);
-        detail.appendChild(price);
+        price.appendChild(realPrice);
+        item.appendChild(name);
+        item.appendChild(quantity);
+        item.appendChild(price);
+        box.append(item);
 
-        box.append(item)
     }
     let item = document.getElementsByClassName("item");
     console.log(item[0]);
