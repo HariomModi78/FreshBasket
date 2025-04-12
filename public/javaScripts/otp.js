@@ -20,7 +20,10 @@ four.addEventListener("input",function(){
         otp.style.cssText = "background-color:green"
 })
 form.addEventListener("submit",function(){
-        icon.classList = "motion logo"
+        icon.classList = "motion logo";
+        setTimeout(function(){
+                icon.classList.remove("motion")
+        },3000)
 })
 
 
