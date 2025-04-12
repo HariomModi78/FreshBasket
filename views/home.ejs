@@ -97,7 +97,9 @@
         <div class="categary">
             <%categary.forEach(function(val){%>
                 <div class="categaryBox" id="<%=val.name%>">
-                    <img src="<%=val.imagePath%>" alt="" id="<%=val.name%>">
+                    <div class="categaryImage">
+                        <img src="<%=val.imagePath%>" alt="" id="<%=val.name%>">
+                    </div>
                     <p id="<%=val.name%>"><%=val.name%></p>
                 </div>
             <%})%>
