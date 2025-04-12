@@ -18,14 +18,21 @@
         </div>
         <div class="box">
             <%product.forEach(function(val){%>
-                <div class="item" id="<%=val._id%>">
-                    <div class="itemImage">
-                        <img src="<%=val.imagePath%>" alt="">
+                <div class="barItem item" id="<%=val._id%>">
+                    <div class="image image1">
+                        <img src="<%=val.imagePath%>" alt="Image">
                     </div>
-                    <div class="name"><%=val.name%></div>
-                    <div class="quantity"><%=val.quantity%></div>
-                    <div class="price">₹<%=val.price%>/-</div>
-                </div>
+                    <div class="itemName"><%=val.name%></div>
+                    <div class="off"><%=val.quantity%></div>
+
+                    <div class="price">
+                     
+                        <div class="realPrice">₹<%=val.price%>/-</div>
+                    </div>
+                    
+                   
+                    <div class="addToCart">View</div>
+            </div>
             <%})%>
            
             
