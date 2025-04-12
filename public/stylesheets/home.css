@@ -38,7 +38,8 @@ main{
     background-image: url(https://img.freepik.com/premium-vector/grand-opening-banner-brick-wall-background-template-with-3d-editable-text-effect_622741-21.jpg?ga=GA1.1.279815418.1734699810&semt=ais_hybrid&w=740);
     background-repeat: no-repeat;
     background-position: top;
-    background-size: 140% 30rem;
+
+    background-size: 180% 30rem;
     /* background-position-y:4rem ; */
     
 } 
