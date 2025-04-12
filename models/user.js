@@ -30,6 +30,7 @@ const userSchema = mongoose.Schema({
         default:"Hariom Milk User"
     },
     email:String,
+    pin:String,
     mobileNumber:String,
     address:String,
     profilePicture:String,
