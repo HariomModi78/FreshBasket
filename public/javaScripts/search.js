@@ -44,7 +44,7 @@ socket.on("searchResult",function(product){
         box.append(item);
 
     }
-    let item = document.getElementsByClassName("item");
+    let item = document.getElementsByClassName("barItem");
     console.log(item[0]);
     for(let i=0;i<item.length;i++){
         item[i].addEventListener("click",function(){
