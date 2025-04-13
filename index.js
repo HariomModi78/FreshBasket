@@ -14,7 +14,7 @@ const io = socket(server)
 const mongoose = require("mongoose")
 const userDataBase = require("./models/user.js");
 const categaryDataBase = require("./models/categary.js");
-const sellerDataBase = require("./models/seller.js");
+const milkDataBase = require("./models/milk.js");
 const productDataBase = require("./models/product.js");
 const transactionDataBase = require("./models/transaction.js");
 const orderDataBase = require("./models/order.js");
@@ -40,7 +40,6 @@ const storage = multer.diskStorage({
     }
 })
 const upload = multer({storage:storage});
-//.log(process.env.SECRET);
 const transporter = nodemailer.createTransport({
     secure:true,
     host:"smtp.gmail.com", 
@@ -150,6 +149,7 @@ app.post("/verifyPin",async function(req,res){
 })
 app.post("/createPin",async function(req,res){
     let pin = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
+    res.cookie("email1",req.cookies.email);
     let user = await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
         pin:pin
     });
@@ -159,7 +159,9 @@ app.get("/sellerSignup",async function(req,res){
     try{
         let user = await userDataBase.findOne({email:req.cookies.email1});
         if(user.type =="farmer"){
-            res.render("sellerPage",{user:user});
+            let milk = await milkDataBase.find({date:new Date(),userId:user._id});
+            console.log(milk)
+            res.render("sellerPage",{user:user,milk:milk});
         }
         else{
             res.render("sellerSignup",{user:user});
@@ -182,9 +184,9 @@ app.post("/sellerSignup1",upload.single("image"),async function(req,res){
             address:req.body.address,
             profilePicture:cloudinaryResponce.url
         })
-        await sellerDataBase.create({
-            userId:user._id
-        })
+        // await sellerDataBase.create({
+        //     userId:user._id
+        // })
         res.render("sellerPage",{user:user});
     }catch(e){
         res.render("error")
@@ -195,7 +197,7 @@ app.get("/home",async function(req,res){
     try{
         if(req.cookies.email1){
             let user =  await userDataBase.findOne({email:req.cookies.email1});
-            console.log(user)
+            //(user)
             let categary = await categaryDataBase.find();
             let product = await productDataBase.find();
             
@@ -528,6 +530,30 @@ app.post("/admin/add/categary",async function(req,res){
 }) 
 app.get("/admin/order",function(req,res){
     res.render("adminOrder");
+})
+app.get("/admin/milkUpload",async function(req,res){
+    let seller = await userDataBase.find({type:"farmer"});
+    //(seller)
+    res.render("adminMilkUpload",{seller:seller});
+})
+app.get("/admin/milkUpload/:sellerId",async function(req,res){
+    let seller = await userDataBase.findOne({_id:req.params.sellerId});
+    res.render("adminMilkUploadPage",{seller:seller});
+})
+app.post("/admin/milkUpload/:userId",async function(req,res){
+    //(req.body.time);
+    let milk = await milkDataBase.create({
+        userId:req.params.userId,
+        quantity:req.body.quantity,
+        fat:req.body.fat,
+        date:new Date(),
+        time:req.body.time
+    })
+    //(milk)
+    //(new Date().getHours());
+    let seller = await userDataBase.find({type:"farmer"});
+    //(seller)
+    res.redirect("/admin/milkUpload");
 })
 app.post("/detail",async function(req,res){
     try{
@@ -952,7 +978,7 @@ app.get("/nearOrderDetail/:userId",async function(req,res){
     let user = await userDataBase.findOne({_id:req.params.userId});
     let order = await orderDataBase.find({orderStatus:"order placed",userId:req.params.userId});
     order.sort((a, b) => a.name.localeCompare(b.name));
-    console.log(order)
+    //(order)
     res.render("nearOrderDetail",{order:order,user:user});
 })
 app.post("/openScanner",async function(req,res){
