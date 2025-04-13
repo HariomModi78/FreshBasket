@@ -159,7 +159,8 @@ app.get("/sellerSignup",async function(req,res){
     try{
         let user = await userDataBase.findOne({email:req.cookies.email1});
         if(user.type =="farmer"){
-            let day = new Date().toLocaleDateString();
+            let day = new Date().toISOString().split("T")[0];
+            console.log(day);
             let morningMilk = await milkDataBase.findOne({day:day,userId:user._id,time:"morning"});
             let eveningMilk = await milkDataBase.findOne({day:day,userId:user._id,time:"evening"});
             // console.log(milk);
@@ -550,7 +551,7 @@ app.post("/admin/milkUpload/:userId",async function(req,res){
         fat:req.body.fat,
         date:new Date(),
         time:req.body.time,
-        day:new Date().toLocaleDateString()
+        day:new Date().toISOString().split("T")[0]
     })
     //(milk)
     //(new Date().getHours());
