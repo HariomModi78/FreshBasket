@@ -1,0 +1,221 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;font-weight:500;
+}
+body{
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    user-select: none;
+    /* background-image: url(/images/cow.png);
+    background-position: center;
+    background-size: contain;
+    background-position: top ;
+    background-repeat: no-repeat;
+    background-position-y: 4rem; */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    overflow-x: hidden;
+
+}
+main{
+    height: 100%;
+    width: fit-content;
+    min-width: fit-content;
+    min-height: fit-content;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    /* background: linear-gradient( 145deg,rgb(0, 255, 255),rgba(0, 255, 255, 0.33),rgba(0, 255, 255, 0.42),rgba(0, 255, 255, 0.141),white,white,white); */
+}
+.header{
+    height: 4.5rem;
+    max-width: 100vw;
+    width: 30rem;
+    /* border: 1px solid black; */
+    /* position: sticky;
+    top: 0; */
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    /* background-color: white; */
+
+}
+
+.input{
+    height: 60%;
+    width: 75%;
+    border-radius: 15px;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    padding-left: 0.5rem;
+    background-color: white;
+}
+.input img{
+    min-height: 2rem;
+}
+.header img{
+    height: 60%;
+}
+.box{
+    height: fit-content;
+    width: 100%;
+    max-width: 30rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+
+}
+
+.barItem{
+    height: 15rem;
+    width: 9rem;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    flex-direction: column;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.097);
+    /* background-color: rgba(128, 128, 128, 0.061); */
+
+}
+.barItem:hover img{ 
+    background-color: rgba(128, 128, 128, 0.623);
+    animation: motion linear 1.5s forwards ;
+    animation-iteration-count: 2;
+} 
+
+@keyframes motion{
+    100%{
+        transform: rotateY(360deg);
+    }
+}
+.image{
+    height: 50%;
+    width: 100%;
+    border-radius: 7px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+.image img{
+    height: 70%;
+    width: 70%;
+    
+
+    /* object-position: center; */
+    
+    /* display: flex; */
+    mix-blend-mode: multiply;
+
+}
+
+
+.itemName{
+    padding-left: 0.5rem;
+    width: 100%;
+    height: 2.7rem;
+    border: 1px solid white;
+    /* display: flex; */
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+   flex-wrap: wrap;
+   overflow: hidden;
+    
+}
+.price,.off{
+    padding-left: 0.5rem;
+    padding-top: 0.5rem;
+    width: 100%;
+    height: 2rem;
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.fakePrice{
+    text-decoration: line-through;
+    opacity: 0.6;
+    display: flex;
+   flex-shrink: 0;
+   height: 100%;
+
+}
+.realPrice{
+    padding-left: 0.3rem;
+    font-weight: 600;
+   flex-shrink: 0;
+   height: 100%;
+
+
+}
+.off{
+    font-weight: 600;
+}
+.addToCart{
+     display: none;
+}
+.footer{
+    height: 4.5rem;
+    max-width: 100vw;
+    width: 30rem;
+    /* border: 1px solid black; */
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    background-color: white;
+
+}
+.footerBox{
+    height: 100%;
+    width: 7rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-wrap: wrap;
+    text-align: center;
+    font-size: 0.8rem;
+    /* border-top: 1px solid black; */
+     transition: all linear 10ms;
+}
+.footerBox:active{
+    background-color: gray;
+}
+.center{
+    border-radius: 50%;
+    /* border: 1px solid black; */
+    bottom: 2rem;
+    position: relative;
+    background-color: white;
+    /* background-color: rgba(0, 255, 255, 0.744); */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.39),inset 0 0 10px rgba(218, 218, 218, 0.226);
+}
+.center img{
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+    mix-blend-mode: multiply;
+    
+
+}
+.footerBox img{
+    height: 1.6rem;
+    width: 1.6rem;
+}
+.seller img{
+    height: 1.9rem;
+    width: 1.9rem;
+}
+.fakeFooter{
+    height: 5rem;
+    width: 100%;
+}
