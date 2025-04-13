@@ -45,48 +45,62 @@
         <div class="todayReport">
             <h1>Today Report</h1>
             <div class="morningReport">
-                <div class="row">
-                    <h3>Morning</h3>
-                </div>
-                <div class="row">
-                    <p>Total Milk : </p>
-                    <p><%=milk.quantity%></p>
-                    <%=milk%>
-                </div>
-                <div class="row">
-                    <p>Fat :</p>
-                    <p><%=milk.fat%></p>
-                </div>
-                <div class="row">
-                    <p>Price pre liter :</p>
-                    <p>₹<%milk.fat*8.1%></p>
-                </div>
-                <div class="row">
-                    <p>Total Profit :</p>
-                    <p>₹<%=milk.quantity*milk.fat%></p>
-                </div>
-            </div>
+                <%if(morningMilk){%>
+                    <div class="row">
+                        <h3>Morning</h3>
+                    </div>
+                    <div class="row">
+                        <p>Total Milk : </p>
+                        <p><%=morningMilk.quantity%></p>
+                    </div>
+                    <div class="row">
+                        <p>Fat :</p>
+                        <p><%=morningMilk.fat%></p>
+                    </div>
+                    <div class="row">
+                        <p>Price pre liter :</p>
+                        <p>₹<%morningMilk.fat*8.1%></p>
+                    </div>
+                    <div class="row">
+                        <p>Total Profit :</p>
+                        <p>₹<%=((morningMilk.quantity)*(morningMilk.fat)*8.1).toFixed(2)%></p>
+                    </div>
+                </div> 
+                <%}else{%>
+                    <div class="nightReport" style="display: flex;justify-content: center;">
+                        <b style="place-self: center;">No record</b>
+                    </div>
+                <%}%>
+                
+           
             <div class="nightReport">
-                <div class="row">
-                    <h3>Night</h3>
-                </div>
-                <div class="row">
-                    <p>Total Milk : </p>
-                    <p><%=milk.quantity%></p>
-                </div>
-                <div class="row">
-                    <p>Fat :</p>
-                    <p><%=milk.fat%></p>
-                </div>
-                <div class="row">
-                    <p>Price pre liter :</p>
-                    <p>₹<%milk.fat*8.1%></p>
-                </div>
-                <div class="row">
-                    <p>Total Profit :</p>
-                    <p>₹<%=milk.quantity*milk.fat%></p>
-                </div>
+                <%if(eveningMilk){%>
+                    <div class="row">
+                        <h3>Night</h3>
+                    </div>
+                    <div class="row">
+                        <p>Total Milk : </p>
+                        <p><%=eveningMilk.quantity%></p>
+                    </div>
+                    <div class="row">
+                        <p>Fat :</p>
+                        <p><%=eveningMilk.fat%></p>
+                    </div>
+                    <div class="row">
+                        <p>Price pre liter :</p>
+                        <p>₹<%eveningMilk.fat*8.1%></p>
+                    </div>
+                    <div class="row">
+                        <p>Total Profit :</p>
+                        <p>₹<%=((morningMilk.quantity)*(morningMilk.fat)*8.1).toFixed(2)%></p>
+                    </div>
             </div>
+
+                <%}else{%>
+                    <div class="nightReport" style="display: flex;justify-content: center;">
+                        <b style="place-self: center;">No record</b>
+                    </div>
+                <%}%>
         </div>
         <div class="option">
             <div class="box report" id="report">
