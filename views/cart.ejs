@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hariom Milk</title>
+    <link rel="stylesheet" href="/stylesheets/cart.css">
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+" crossorigin="anonymous"></script>
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#317EFB">
+</head>
+<body> 
+    <main> 
+        <div class="header">
+            My Cart
+        </div>
+        <%product.forEach(function(val){%>
+            <div class="order" id="<%=val._id%>">
+                <div class="orderHeader">
+                    <div class="productImage">
+                        <img src="<%=val.imagePath%>" alt="">
+                            <select name="" id="" class="quantity" >
+                                <option value="1">Qty1</option>
+                                <option value="2">Qty2</option>
+                                <option value="3">Qty3</option>
+                                <option value="4">Qty4</option>
+                                <option value="5">Qty5</option>
+                                <option value="6">Qty6</option>
+                                <option value="7">Qty7</option>
+                            </select>
+                    </div>
+                    <div class="detail">
+                        <div class="name"><%=val.name%></div>
+                        <div class="orderQuantity"><%=val.quantity%></div>
+                        <div class="price">₹<div class="pricejs" ><%=val.price%></div>/-</div>
+                        <div class="time">Total Amount : ₹<p class="totalAmount"></p>/-</div>
+                    </div>
+                </div>
+                <div class="orderFooter">
+                    <div class="remove" id="<%=val._id%>">Remove</div>
+                    <div class="saveForLater" id="<%=val._id%>">Save For Later</div>
+                    <div class="buy" id="<%=val._id%>">Buy Now</div>
+                </div>
+            </div>
+        <%})%>
+
+        <%if(product.length!=0){%>
+                <div style="display: flex;">₹<div class="lastAmount"></div>/-</div>
+                <input type="submit" value="Place Order"  class="confirmOrder" id="<%=product.id%>">
+        <%}else{%>
+            <b style="padding-top: 10rem;" >No record</b>
+        <%}%>
+        <%if(saveForLater.length!=0){%>
+            <h2>Save for Later <%=saveForLater.length%></h2>
+        <%}%>
+        <%saveForLater.forEach(function(val){%>
+            <div class="order" id="<%=val._id%>">
+                <div class="orderHeader">
+                    <div class="productImage">
+                        <img src="<%=val.imagePath%>" alt="">
+                            <select name="" id="" class="quantity" >
+                                <option value="1">Qty1</option>
+                                <option value="2">Qty2</option>
+                                <option value="3">Qty3</option>
+                                <option value="4">Qty4</option>
+                                <option value="5">Qty5</option>
+                                <option value="6">Qty6</option>
+                                <option value="7">Qty7</option>
+                            </select>
+                    </div>
+                    <div class="detail">
+                        <div class="name"><%=val.name%></div>
+                        <div class="orderQuantity"><%=val.quantity%></div>
+                        <div class="price">₹<div class="pricejs" ><%=val.price%></div>/-</div>
+                        <!-- <div class="time">Total Amount : ₹<p class="totalAmount"></p>/-</div> -->
+                    </div>
+                </div>
+                <div class="orderFooter">
+                    <div class="addToCart" id="<%=val._id%>">Add To Cart</div>
+                </div>
+            </div>
+        <%})%>
+        <div class="fakeFooter"></div>
+        <div class="fakeFooter"></div>
+        <div class="footer">
+            <div class="footerBox home" id="home">
+                <img src="https://cdn-icons-png.flaticon.com/128/263/263115.png" id="home" alt="">
+                <pid="home" >Home</p>
+            </div>
+            <div class="footerBox seller" id="order">
+                <img src="https://cdn-icons-png.flaticon.com/128/11458/11458660.png" id="order" alt="">
+                <p id="order">Order</p>
+            </div>
+            <div class="footerBox center cart" id="cart">
+                <img src="https://cdn-icons-gif.flaticon.com/6416/6416376.gif" id="cart" alt="">
+                <p id="cart">Cart</p>
+
+            </div>
+            <div class="footerBox feed" id="wallet">
+                <img src="https://cdn-icons-png.flaticon.com/128/869/869118.png" id="wallet" alt="">
+                <p id="wallet">Wallet</p>
+            </div>
+            <div class="footerBox more" id="more">
+                <img src="https://cdn-icons-png.flaticon.com/128/9091/9091427.png" id="more" alt="">
+                <p id="more">More</p>
+            </div>
+        </div>
+    </main>
+    <script src="/javaScripts/nav.js"></script>
+    <script src="/javaScripts/loader.js"></script>
+    <script src="/javaScripts/cart.js"></script>
+    
+</body>
+</html>
