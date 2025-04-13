@@ -5,7 +5,8 @@ const milkSchema = mongoose.Schema({
     quantity:Number,
     fat:Number,
     date:Date,
-    time:String
+    time:String,
+    day:String
 })
 
 module.exports = mongoose.model("milk",milkSchema);
