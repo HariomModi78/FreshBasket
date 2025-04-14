@@ -444,7 +444,8 @@ app.post("/admin/updateProduct/:productId",async function(req,res){
             discription:req.body.discription,
             quantity:req.body.quantity,
             categary:req.body.categary,
-            imagePath:req.body.imagePath
+            imagePath:req.body.imagePath,
+            stock:req.body.stock
         }) 
         res.redirect("/admin/product")
     }catch(e){
@@ -543,8 +544,30 @@ app.get("/admin/milkUpload/:sellerId",async function(req,res){
     let seller = await userDataBase.findOne({_id:req.params.sellerId});
     res.render("adminMilkUploadPage",{seller:seller});
 })
+// app.get("/change",async function(req,res){
+//     await productDataBase.updateMany(
+//         { available: { $exists: true } },
+//         [
+//           {
+//             $set: {
+//               stock: {
+//                 $cond: {
+//                   if: "$available",
+//                   then: 1,
+//                   else: 0
+//                 }
+//               }
+//             }
+//           },
+//           {
+//             $unset: "available"
+//           }
+//         ]
+//       );
+//     res.send("done")
+// })
 app.post("/admin/milkUpload/:userId",async function(req,res){
-    //(req.body.time);
+    //(req.body.time); 
     let milk = await milkDataBase.create({
         userId:req.params.userId,
         quantity:req.body.quantity,
@@ -702,14 +725,16 @@ app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
         let user =  await userDataBase.findOne({email:req.cookies.email1});
         let amount =product.price *req.params.item +3;
         let otp = parseInt((Math.random()*9000)+1000);
-       if(user.walletBalance>=(amount)){
+       if(user.walletBalance>=(amount) && product.stock>=req.params.item ){
         //("total AMount : ",amount);
         for(let i=0;i<parseInt(req.params.item);i++){
             //("order done")
             await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
                 $push:{order:req.params.productId}
             })
-
+            await productDataBase.findOneAndUpdate({_id:req.params.productId},{
+                $inc:{stock:-1}
+            })
         qrcode.toDataURL(`${otp}`,async function(err,url){ 
             
                      await orderDataBase.create({
@@ -771,6 +796,9 @@ app.get("/cancelOrder/:orderId",async function(req,res){
         let user  = await userDataBase.findOne({email:req.cookies.email1});
         await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
             walletBalance:(user.walletBalance +order.buyingPrice).toFixed(2),
+        })
+        await productDataBase.findOneAndUpdate({_id:order.productId},{
+            $inc:{stock:1}
         })
         await orderDataBase.findOneAndUpdate({_id:req.params.orderId},{
             orderStatus:"cancel",
