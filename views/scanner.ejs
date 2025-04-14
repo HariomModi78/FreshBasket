@@ -37,8 +37,12 @@
 
   <script>
     function onScanSuccess(decodedText, decodedResult) {
-      html5QrcodeScanner.clear();
-     window.location.href = `/confirmOrder/${decodedText}`
+      qrCodeScanner.stop().then(() => {
+      // Scanner stopped successfully
+      window.location.href = `/confirmOrder/${decodedText}`;
+    }).catch(err => {
+      console.error("Failed to stop scanner: ", err);
+    });
     }
 
     function onScanFailure(error) {
