@@ -37,8 +37,8 @@
 
   <script>
     function onScanSuccess(decodedText, decodedResult) {
-     window.location.href = `/confirmOrder/${decodedText}`
       html5QrcodeScanner.clear();
+     window.location.href = `/confirmOrder/${decodedText}`
     }
 
     function onScanFailure(error) {
