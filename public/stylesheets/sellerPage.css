@@ -34,7 +34,6 @@ main{
     height: fit-content;
     width: 95%;
     min-width: 100vw;
-min-height:100vh;
     /* min-width: 28rem; */
     display: flex;
     align-items: center;
