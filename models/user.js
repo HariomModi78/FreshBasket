@@ -44,7 +44,10 @@ const userSchema = mongoose.Schema({
       type:Boolean,
       default:true
     },
-    totalSpend:Number,
+    totalSpend:{
+      type:Number,
+      default:0
+    },
     type:{
         type:String,
         default:"user"
