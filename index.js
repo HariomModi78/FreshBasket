@@ -19,7 +19,8 @@ const productDataBase = require("./models/product.js");
 const transactionDataBase = require("./models/transaction.js");
 const orderDataBase = require("./models/order.js");
 const feedbackDataBase = require("./models/feedback.js");
-const user = require("./models/user.js");
+const referDataBase = require("./models/refer.js");
+
 
 require('dotenv').config();
 
@@ -131,6 +132,12 @@ app.post("/verify",async function(req,res){
     }
     
 })
+// app.get("/stock",async function(req,res){
+//     await userDataBase.updateMany({},{
+//         refer:false
+//     })
+//     res.send("done");
+// })
 app.post("/verifyPin",async function(req,res){
     try{
         let pin = `${req.body.one}${req.body.two}${req.body.three}${req.body.four}`;
@@ -230,8 +237,29 @@ app.get("/more",async function(req,res){
 app.get("/checkProfit",function(req,res){
     res.render("checkProfit");
 })
-app.get("/refer",function(req,res){
-    res.render("refer");
+app.get("/refer",async function(req,res){
+    let user = await userDataBase.findOne({email:req.cookies.email1});
+    let refer = await referDataBase.find({userId:user._id});
+    let friendId = [];
+    refer.forEach(function(val){
+       friendId.push(val.friendId);
+    })
+    let referUser = await userDataBase.find({_id:friendId});
+    // console.log(referUser)
+    // res.send("done");
+    let order = await orderDataBase.find({userId:friendId._id,orderStatus:"delivered"});
+    console.log(order);
+    res.render("refer",{user:user,referUser:referUser});
+})
+app.post("/referConfirm",async function(req,res){
+    let friend = await userDataBase.findOne({email:req.cookies.email1});
+    let user = await userDataBase.findOne({email:req.body.referCode});
+    await referDataBase.create({
+        userId:user._id,
+        friendId:friend._id,
+    })
+    
+    res.send(`req.body.referCode`)
 })
 app.get("/wallet",async function(req,res){
     try{
@@ -729,9 +757,9 @@ app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
         //("total AMount : ",amount);
         for(let i=0;i<parseInt(req.params.item);i++){
             //("order done")
-            await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
-                $push:{order:req.params.productId}
-            })
+            // await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
+            //     $push:{order:req.params.productId}
+            // })
             await productDataBase.findOneAndUpdate({_id:req.params.productId},{
                 $inc:{stock:-1}
             })
@@ -754,7 +782,7 @@ app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
                 
             
         }
-            
+        
         await transactionDataBase.create({
             userId:user._id,
             amount:(amount).toString(),
@@ -800,8 +828,9 @@ app.get("/cancelOrder/:orderId",async function(req,res){
         await productDataBase.findOneAndUpdate({_id:order.productId},{
             $inc:{stock:1}
         })
+        
         await orderDataBase.findOneAndUpdate({_id:req.params.orderId},{
-            orderStatus:"cancel",
+            orderStatus:"cancel", 
             otp:"cancel"
         });
         await transactionDataBase.create({
@@ -1021,6 +1050,16 @@ app.get("/confirmOrder/:otp",async function(req,res){
     await orderDataBase.updateMany({otp:req.params.otp},{
         orderStatus:"delivered"
     })
+    let order = await orderDataBase.find({otp:req.params.otp});
+    console.log(order);
+    let sum = 0;
+    order.forEach(function(val){
+        sum = sum + val.buyingPrice;
+    })
+    await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
+        $inc:{totalSpend:sum}
+    })  
+
     res.redirect("/nearOrder");
 })
 
