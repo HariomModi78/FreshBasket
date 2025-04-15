@@ -20,6 +20,7 @@ const transactionDataBase = require("./models/transaction.js");
 const orderDataBase = require("./models/order.js");
 const feedbackDataBase = require("./models/feedback.js");
 const referDataBase = require("./models/refer.js");
+const user = require("./models/user.js");
 
 
 require('dotenv').config();
@@ -239,6 +240,7 @@ app.get("/checkProfit",function(req,res){
 })
 app.get("/refer",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email1});
+    
     let refer = await referDataBase.find({userId:user._id});
     let friendId = [];
     refer.forEach(function(val){
@@ -254,6 +256,9 @@ app.get("/refer",async function(req,res){
 app.post("/referConfirm",async function(req,res){
     let friend = await userDataBase.findOne({email:req.cookies.email1});
     let user = await userDataBase.findOne({email:req.body.referCode});
+    await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
+        refer:false
+    })
     await referDataBase.create({
         userId:user._id,
         friendId:friend._id,
@@ -1043,7 +1048,7 @@ app.get("/nearOrderDetail/:userId",async function(req,res){
     res.render("nearOrderDetail",{order:order,user:user});
 })
 app.post("/openScanner",async function(req,res){
-    let user = await userDataBase.findOne({email:req.params.email});
+    let user = await userDataBase.findOne({email:req.cookies.email});
     res.render("scanner");
 })
 app.get("/confirmOrder/:otp",async function(req,res){
@@ -1051,14 +1056,17 @@ app.get("/confirmOrder/:otp",async function(req,res){
         orderStatus:"delivered"
     })
     let order = await orderDataBase.find({otp:req.params.otp});
-    console.log(order);
+    
+    console.log("Order = ",order);
     let sum = 0;
     order.forEach(function(val){
         sum = sum + val.buyingPrice;
     })
-    await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
+    console.log(order[0].userId);
+    await userDataBase.findOneAndUpdate({_id:order[0].userId},{
         $inc:{totalSpend:sum}
-    })  
+    }) 
+    
 
     res.redirect("/nearOrder");
 })
