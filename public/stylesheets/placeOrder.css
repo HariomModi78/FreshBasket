@@ -250,6 +250,14 @@ main{
     height: 5rem;
     width: 100%;
 }
+
+.done{
+    position: absolute;
+    height: 100%;
+    background-color: rgba(0, 255, 174, 0.593);
+    left: 0;
+
+}
 .confirmOrder{
     height: 2.5rem;
     width: 8rem;
@@ -261,11 +269,9 @@ main{
     justify-content: center;
     align-items: center;
     font-size: 1rem;
-    transition: all linear 350ms;
+    overflow: hidden;
 }
-.confirmOrder:active{
-    background-color: rgba(128, 128, 128, 0.418);
-}
+
 
 .editAddress{
     display: flex;
@@ -366,3 +372,4 @@ main{
     font-size: 1.1rem;
     font-weight: 600;
 }
+
