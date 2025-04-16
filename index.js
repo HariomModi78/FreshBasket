@@ -238,33 +238,66 @@ app.get("/more",async function(req,res){
 app.get("/checkProfit",function(req,res){
     res.render("checkProfit");
 })
+app.get("/save",async function(req,res){
+    await milkDataBase.deleteMany({},{})
+    res.send("done");
+})
 app.get("/refer",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email1});
-    
     let refer = await referDataBase.find({userId:user._id});
-    let friendId = [];
-    refer.forEach(function(val){
-       friendId.push(val.friendId);
+    refer.forEach(async function(val){
+        if(!val.status){
+            let friend = await userDataBase.findOne({_id:val.friendId});
+            if(friend.totalSpend >=100){
+                await transactionDataBase.create({
+                    userId:user._id,
+                    direction:"+",
+                    paymentMode:"refer bonus",
+                    amount:7,
+                    date:new Date(),
+                    totalBalance:user.walletBalance + 7
+                })
+                await transactionDataBase.create({
+                    userId:friend._id,
+                    direction:"+",
+                    paymentMode:"refer bonus",
+                    amount:7,
+                    date:new Date(),
+                    totalBalance:friend.walletBalance + 7
+                })
+                await userDataBase.findOneAndUpdate({_id:user._id},{
+                    $inc:{walletBalance:7}
+                })
+                await userDataBase.findOneAndUpdate({_id:friend._id},{
+                    $inc:{walletBalance:7}
+                })
+            }
+        }
     })
-    let referUser = await userDataBase.find({_id:friendId});
-    // console.log(referUser)
-    // res.send("done");
-    let order = await orderDataBase.find({userId:friendId._id,orderStatus:"delivered"});
-    console.log(order);
+    let referUser = [];
+
+    refer.forEach(async function(val){
+        referUser.push(val.friendId);
+    })
+    referUser = await userDataBase.find({_id:referUser});
+    console.log(referUser);
     res.render("refer",{user:user,referUser:referUser});
 })
 app.post("/referConfirm",async function(req,res){
-    let friend = await userDataBase.findOne({email:req.cookies.email1});
-    let user = await userDataBase.findOne({email:req.body.referCode});
-    await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
-        refer:false
-    })
-    await referDataBase.create({
-        userId:user._id,
-        friendId:friend._id,
-    })
+    if(req.body.referCode != req.cookies.email1){
+        await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
+            refer:false
+        })
+        await referDataBase.create({
+            userId:req.body.referCode,
+            friendId:req.cookies.email1,
+        })
+        
+        res.redirect("/refer")
+    }else{
+        res.render("error")
+    }
     
-    res.send(`req.body.referCode`)
 })
 app.get("/wallet",async function(req,res){
     try{
