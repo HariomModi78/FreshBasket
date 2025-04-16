@@ -245,6 +245,7 @@ app.get("/save",async function(req,res){
 app.get("/refer",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email1});
     let refer = await referDataBase.find({userId:user._id});
+
     refer.forEach(async function(val){
         if(!val.status){
             let friend = await userDataBase.findOne({_id:val.friendId});
@@ -271,7 +272,12 @@ app.get("/refer",async function(req,res){
                 await userDataBase.findOneAndUpdate({_id:friend._id},{
                     $inc:{walletBalance:7}
                 })
+            await referDataBase.findOneAndUpdate({userId:val.userId,friendId:val.friendId},{
+                status:true
+            });
+                
             }
+
         }
     })
     let referUser = [];
