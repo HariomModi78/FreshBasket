@@ -30,9 +30,26 @@ checkBox.addEventListener("click",function(){
 
 let confirmOrder =  document.querySelector(".confirmOrder");
 let userId =  document.querySelector(".walletDetail");
+let done = document.querySelector(".done");
+let num = 0;
 
 confirmOrder.addEventListener("click",function(){
-    if(checkBox.checked && pay.innerText == 0){
-        window.location.href = `/paymentDone/wallet/${confirmOrder.id}/${localStorage.getItem("item")}`
+    if(num==0){
+        if(checkBox.checked && pay.innerText == 0){
+            let count = 0;
+    
+            let interval = setInterval(function(){
+                done.style.cssText = `width:${count}%`
+                count++;
+                if(count==100){
+                    clearInterval(interval);
+                    done.style.cssText = `width:${0}%`
+        
+                }
+            },10)
+            num++;
+            window.location.href = `/paymentDone/wallet/${confirmOrder.id}/${localStorage.getItem("item")}`
+        }
+       
     }
 })
