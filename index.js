@@ -285,12 +285,15 @@ app.get("/refer",async function(req,res){
 })
 app.post("/referConfirm",async function(req,res){
     if(req.body.referCode != req.cookies.email1){
+        let user = await userDataBase.findOne({email:req.cookies.email1});
+        let friend = await userDataBase.findOne({email:req.body.referCode});
+
         await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
             refer:false
         })
         await referDataBase.create({
-            userId:req.body.referCode,
-            friendId:req.cookies.email1,
+            userId:friend._id,
+            friendId:user._id,
         })
         
         res.redirect("/refer")
