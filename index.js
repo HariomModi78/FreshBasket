@@ -22,6 +22,7 @@ const feedbackDataBase = require("./models/feedback.js");
 const referDataBase = require("./models/refer.js");
 const permissionDataBase = require("./models/permission.js");
 const user = require("./models/user.js");
+const { profile } = require("console");
 
 
 require('dotenv').config();
@@ -195,6 +196,10 @@ app.post("/sellerSignup1",upload.single("image"),async function(req,res){
             folder:"Uploads"
         })
         let user = await userDataBase.findOne({email:req.cookies.email1});
+        await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
+            address:req.body.address,
+            profilePicture:cloudinaryResponce.url
+        })
         await permissionDataBase.create({
             userId:user._id,
             type:"farmer"
@@ -204,13 +209,15 @@ app.post("/sellerSignup1",upload.single("image"),async function(req,res){
         // await sellerDataBase.create({
         //     userId:user._id
         // })
-        res.render("waitingPage",{user:user});
+        res.redirect("/waiting")
     }catch(e){
         res.render("error")
     }
     
 })
-
+app.get("/waiting",function(req,res){
+    res.render("waitingPage");
+})
 app.get("/home",async function(req,res){
     try{
         if(req.cookies.email1){
