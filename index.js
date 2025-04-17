@@ -20,6 +20,7 @@ const transactionDataBase = require("./models/transaction.js");
 const orderDataBase = require("./models/order.js");
 const feedbackDataBase = require("./models/feedback.js");
 const referDataBase = require("./models/refer.js");
+const permissionDataBase = require("./models/permission.js");
 const user = require("./models/user.js");
 
 
@@ -166,13 +167,16 @@ app.post("/createPin",async function(req,res){
 app.get("/sellerSignup",async function(req,res){
     try{
         let user = await userDataBase.findOne({email:req.cookies.email1});
+        let permission = await permissionDataBase.findOne({userId:user._id});
         if(user.type =="farmer"){
             let day = new Date().toISOString().split("T")[0];
-            console.log(day);
+            //(day);
             let morningMilk = await milkDataBase.findOne({day:day,userId:user._id,time:"morning"});
             let eveningMilk = await milkDataBase.findOne({day:day,userId:user._id,time:"evening"});
-            // console.log(milk);
+            // //(milk);
             res.render("sellerPage",{user:user,morningMilk:morningMilk,eveningMilk:eveningMilk});
+        }else if(permission){
+            res.render("waitingPage",{user:user});
         }
         else{
             res.render("sellerSignup",{user:user});
@@ -190,20 +194,23 @@ app.post("/sellerSignup1",upload.single("image"),async function(req,res){
                 
             folder:"Uploads"
         })
-        let user = await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
-            type:"farmer",
-            address:req.body.address,
-            profilePicture:cloudinaryResponce.url
+        let user = await userDataBase.findOne({email:req.cookies.email1});
+        await permissionDataBase.create({
+            userId:user._id,
+            type:"farmer"
         })
+   
+
         // await sellerDataBase.create({
         //     userId:user._id
         // })
-        res.render("sellerPage",{user:user});
+        res.render("waitingPage",{user:user});
     }catch(e){
         res.render("error")
     }
     
 })
+
 app.get("/home",async function(req,res){
     try{
         if(req.cookies.email1){
@@ -235,13 +242,27 @@ app.get("/more",async function(req,res){
     }
    
 })
+app.get("/admin/more",async function(req,res){
+    try{
+        if(admin(req.cookies.email1)){
+            let user =  await userDataBase.findOne({email:req.cookies.email1});
+            res.render("adminMore",{user:user});    
+        }
+        else{
+            res.render("error")
+        }
+    }catch(e){
+        res.render("error") 
+    }
+   
+})
 app.get("/checkProfit",function(req,res){
     res.render("checkProfit");
 })
-app.get("/save",async function(req,res){
-    await milkDataBase.deleteMany({},{})
-    res.send("done");
-})
+// app.get("/save",async function(req,res){   // for delteing some collection
+//     await orderDataBase.deleteMany({},{})
+//     res.send("done");
+// })
 app.get("/refer",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email1});
     let refer = await referDataBase.find({userId:user._id});
@@ -267,10 +288,10 @@ app.get("/refer",async function(req,res){
                     totalBalance:friend.walletBalance + 7
                 })
                 await userDataBase.findOneAndUpdate({_id:user._id},{
-                    $inc:{walletBalance:7}
+                    $inc:{walletBalance:7,referAmount:7},
                 })
                 await userDataBase.findOneAndUpdate({_id:friend._id},{
-                    $inc:{walletBalance:7}
+                    $inc:{walletBalance:7,referAmount:7},
                 })
             await referDataBase.findOneAndUpdate({userId:val.userId,friendId:val.friendId},{
                 status:true
@@ -286,7 +307,7 @@ app.get("/refer",async function(req,res){
         referUser.push(val.friendId);
     })
     referUser = await userDataBase.find({_id:referUser});
-    console.log(referUser);
+    //(referUser);
     res.render("refer",{user:user,referUser:referUser});
 })
 app.post("/referConfirm",async function(req,res){
@@ -312,6 +333,15 @@ app.get("/wallet",async function(req,res){
     try{
         let user = await userDataBase.findOne({email:req.cookies.email1});
         res.render("wallet",{user:user});
+    }catch(e){
+        res.render("error")
+    }
+    
+})
+app.get("/addMoney",async function(req,res){
+    try{
+        let user = await userDataBase.findOne({email:req.cookies.email1});
+        res.render("addMoney",{user:user});
     }catch(e){
         res.render("error")
     }
@@ -503,9 +533,15 @@ app.post("/admin/addProduct",async function(req,res){
     
 })
 app.get("/admin/UpdateProduct/:productId",async function(req,res){
+    
     try{
-        let product = await productDataBase.findOne({_id:req.params.productId});
-        res.render("adminUpdateProduct",{product:product});
+        if(admin(req.cookies.email1)){
+            let product = await productDataBase.findOne({_id:req.params.productId});
+            res.render("adminUpdateProduct",{product:product});
+        }
+       else{
+        res.render("error")
+       }
     }catch(e){
         res.render("error")
     }
@@ -612,10 +648,10 @@ app.get("/admin/order",function(req,res){
 })
 app.get("/admin/milkUpload",async function(req,res){
     let seller = await userDataBase.find({type:"farmer"});
-    //(seller)
     res.render("adminMilkUpload",{seller:seller});
 })
 app.get("/admin/milkUpload/:sellerId",async function(req,res){
+    
     let seller = await userDataBase.findOne({_id:req.params.sellerId});
     res.render("adminMilkUploadPage",{seller:seller});
 })
@@ -656,6 +692,40 @@ app.post("/admin/milkUpload/:userId",async function(req,res){
     let seller = await userDataBase.find({type:"farmer"});
     //(seller)
     res.redirect("/admin/milkUpload");
+})
+app.get("/admin/permission",async function(req,res){
+    let permission = await permissionDataBase.find();
+    let userId = [];
+    permission.forEach(function(val){
+        userId.push(val.userId);
+    })
+    let users = await userDataBase.find({_id:userId});
+    //(users)
+    res.render("adminPermissionPage",{users:users});
+})
+app.get("/permission/:status/:userId",async function(req,res){
+    try{
+        if(req.params.status == "approve"){
+            let permission = await permissionDataBase.findOne({userId:req.params.userId});
+            await userDataBase.findOneAndUpdate({_id:req.params.userId},{
+                type:permission.type
+            })
+            await permissionDataBase.findOneAndDelete({userId:req.params.userId});
+            res.redirect("/admin/permission");
+        }else{
+            await permissionDataBase.findOneAndDelete({userId:req.params.userId});
+            res.redirect("/admin/permission");
+            
+        }
+    }catch(e){
+        res.render("error");
+    }
+})
+app.get("/change",async function(req,res){
+    await userDataBase.updateMany({},{
+        type:"user"
+    })
+    res.send("done")
 })
 app.post("/detail",async function(req,res){
     try{
@@ -1099,12 +1169,12 @@ app.get("/confirmOrder/:otp",async function(req,res){
     })
     let order = await orderDataBase.find({otp:req.params.otp});
     
-    console.log("Order = ",order);
+    //("Order = ",order);
     let sum = 0;
     order.forEach(function(val){
         sum = sum + val.buyingPrice;
     })
-    console.log(order[0].userId);
+    //(order[0].userId);
     await userDataBase.findOneAndUpdate({_id:order[0].userId},{
         $inc:{totalSpend:sum}
     }) 
