@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hariom Milk</title>
+    <link rel="stylesheet" href="/stylesheets/more.css">
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#317EFB">
+<style>
+    /* Fullscreen Loader */
+    #loader {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    /* Loader Animation */
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #ddd;
+        border-top: 5px solid blue;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+</head>
+<body>
+    <main>
+        <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+        <div class="header2">
+            <div class="box permission">
+                <img src="https://cdn-icons-png.flaticon.com/128/17707/17707613.png" alt="">
+                    <p>Permission</p>
+            </div>
+            <div class="box revenue">
+                <img src="https://cdn-icons-png.flaticon.com/128/10365/10365322.png" alt="">
+                <p>Revanue</p>
+            </div>
+            <div class="box subscription">
+                <img src="https://cdn-icons-png.flaticon.com/128/5024/5024752.png" alt="">
+                <p>Subscription</p>
+            </div>
+        </div>
+        <!-- <div class="address">
+            
+        </div> -->
+        <div class="optionBox bill">
+            <div class="icon">
+                <img src="https://cdn-icons-png.flaticon.com/128/7506/7506440.png" alt="">
+            </div>
+            <div class="option">
+                <p>Farmer Bills</p>
+                <i class="ri-arrow-right-s-line"></i>
+            </div>
+        </div>
+        
+        
+        <div class="optionBox refer">
+            <div class="icon">
+                <img src="https://cdn-icons-png.flaticon.com/128/3380/3380945.png" alt="">
+            </div>
+            <div class="option ">
+                <p>Refer & Earn Details</p>
+                <i class="ri-arrow-right-s-line"></i>
+            </div>
+        </div>
+    
+        <div class="optionBox employ">
+            <div class="icon">
+                <img src="https://cdn-icons-png.flaticon.com/128/9166/9166875.png" alt="">
+            </div>
+            <div class="option">
+                <p>Total Employs</p>
+                <i class="ri-arrow-right-s-line"></i>
+            </div>
+        </div>
+        
+       
+       
+        
+        <div class="fakeFooter"></div>
+        <div class="footer">
+            <div class="footerBox home">
+                <img src="https://cdn-icons-png.flaticon.com/128/11744/11744074.png" alt="">
+                <p>Products</p>
+            </div>
+            <div class="footerBox seller">
+                <img src="https://cdn-icons-png.flaticon.com/128/4616/4616095.png" alt="">
+                <p>User Details</p>
+            </div>
+            <div class="footerBox center cart">
+                <img src="https://cdn-icons-png.flaticon.com/128/9752/9752284.png" alt="">
+                <p>Orders</p>
+
+            </div>
+            <div class="footerBox milk">
+                <img src="https://cdn-icons-png.flaticon.com/128/9058/9058574.png" alt="">
+                <p>Milk Details</p>
+            </div>
+            <div class="footerBox more">
+                <img src="https://cdn-icons-png.flaticon.com/128/5996/5996260.png" alt="">
+                <p>More</p>
+            </div>
+        </div>
+    </main>
+    <script src="/javaScripts/adminNav.js"></script>
+    <script src="/javaScripts/adminMore.js"></script>
+    <script src="/javaScripts/loader.js"></script>
+</body>
+</html>

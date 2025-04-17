@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hariom Milk</title>
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#317EFB">
+    <link rel="stylesheet" href="/stylesheets/placeOrder.css">
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+" crossorigin="anonymous"></script>
+    <style>
+        /* Fullscreen Loader */
+        #loader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Loader Animation */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ddd;
+            border-top: 5px solid blue;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+</head>
+<body>
+    <main>
+        <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+        <h2 class="header">Order Details</h2>
+        <div class="tracker">
+        <div class="diagram">
+            <div class="circle completed">1</div>
+            <div class="line"></div>
+            <div class="circle current">2</div>
+            <div class="line"></div>
+            <div class="circle">3</div>
+        </div>
+        <div class="stepName">
+            <div class="addressStep">Address</div>
+            <div class="orderDetailsStep">Order Details</div>
+            <div class="paymentStep">Payment</div>
+        </div>
+    </div>
+    <div class="address">
+        <div class="addressHeader">
+            <p>Delivery Address:</p>
+            <div class="addressChange" id="<%=user._id%>">Change</div>
+        </div>
+        <div class="userName">Hariom Modi</div>
+        <div class="addressText">
+            <%=user.address%>
+        </div>
+    </div>
+    <div class="order" id="<%=product._id%>">
+        <div class="productImage">
+            <img src="<%=product.imagePath%>" alt="">
+                <select name="" id="" class="quantity" >
+                    <option value="1">Qty1</option>
+                    <option value="2">Qty2</option>
+                    <option value="3">Qty3</option>
+                    <option value="4">Qty4</option>
+                    <option value="5">Qty5</option>
+                    <option value="6">Qty6</option>
+                    <option value="7">Qty7</option>
+                </select>
+        </div>
+        <div class="detail">
+            <div class="name"><%=product.name%></div>
+            <div class="orderQuantity"><%=product.quantity%></div>
+            <div class="price">₹<div class="pricejs" ><%=product.price%></div>/-</div>
+            <div class="time">Delivery within 20 MIN <p>-Free Delivery</p></div>
+        </div>
+    </div>
+    <div class="priceDetail">
+        <div class="text">Price Details</div>
+        <div class="priceRow">
+            <p>Price(1 item) :</p>
+            <p>₹<%=product.price%></p>
+        </div>
+        <div class="priceRow">
+            <p>Platfrom Fee :</p>
+            <p>₹3</p>
+        </div>
+        <div class="priceRow">
+            <p>Delivery Fee :</p>
+            <p>Free Delivery</p>
+        </div>
+        <div class="totalPrice">
+            <p>Total amount :</p>
+            <div class="amountFlex">₹<p class="totalAmount"><%=parseInt((product.price).toFixed(2)) %></p>/-</div>
+        </div>
+    </div>  
+        <div class="fakeFooter"></div>
+        <div class="footer" >
+            <form action="/orderPayment/<%=product._id%>" method="post" >
+                <input type="hidden" name="" calss="items">
+                <input type="submit" value="Next Step"  class="confirmOrder" id="<%=product.id%>">
+            </form>
+       
+        </div>
+    </main>
+    <script src="/javaScripts/nav.js"></script>
+    <script src="/javaScripts/placeOrder.js"></script>
+    <script src="/javaScripts/loader.js"></script>
+</body>
+</html>

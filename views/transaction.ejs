@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hariom Milk</title>
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#317EFB">
+    <link rel="stylesheet" href="/stylesheets/transaction.css">
+    <style>
+        /* Fullscreen Loader */
+        #loader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Loader Animation */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ddd;
+            border-top: 5px solid blue;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+        <div class="history">
+            <h1>Transaction History</h1>
+            <%if(!transaction || transaction.length ==0){%>
+                <h3>No record</h3>
+           <%}else{%>
+               
+                <% transaction.forEach(function(val){%>
+                    <%if(val.direction == "+"){%>
+                        <div class="transaction">
+                            <div class="part1">
+                                <div class="date"><%= new Date(val.date).toLocaleDateString()%> <b style="font-size: 0.8rem;padding-left: 0.3rem;"><%= new Date(val.date).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" })%></b></div>
+                                <div class="price">+₹<%=val.amount%></div>
+                            </div>
+                            <div class="part2">
+                                <div class="paymentType"><%=val.paymentMode%></div>
+                                <div class="totalBalance">Closing Balance: ₹<%=val.totalBalance%></div>
+                            </div>
+                        </div>
+                    <%}else{%>
+                        <div class="transaction">
+                            <div class="part1">
+                                <div class="date"><%= new Date(val.date).toLocaleDateString()%><b style="font-size: 0.8rem;padding-left: 0.3rem;"><%= new Date(val.date).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" })%></b></div>
+                                <div class="price red">-₹<%=val.amount%></div>
+                            </div>
+                            <div class="part2">
+                                <div class="paymentType"><%=val.paymentMode%></div>
+                                <div class="totalBalance">Closing Balance: ₹<%=val.totalBalance%></div>
+                            </div>
+                        </div>
+                   <% }%>
+                        
+                   <% })%>
+            <%}%>
+           
+        </div>
+        <div class="fakeFooter"></div>
+        <div class="footer">
+            <div class="footerBox home" id="home">
+                <img src="https://cdn-icons-png.flaticon.com/128/263/263115.png" id="home" alt="">
+                <pid="home" >Home</p>
+            </div>
+            <div class="footerBox seller" id="order">
+                <img src="https://cdn-icons-png.flaticon.com/128/11458/11458660.png" id="order" alt="">
+                <p id="order">Order</p>
+            </div>
+            <div class="footerBox center cart" id="cart">
+                <img src="https://cdn-icons-gif.flaticon.com/6416/6416376.gif" id="cart" alt="">
+                <p id="cart">Cart</p>
+
+            </div>
+            <div class="footerBox feed" id="wallet">
+                <img src="https://cdn-icons-png.flaticon.com/128/869/869118.png" id="wallet" alt="">
+                <p id="wallet">Wallet</p>
+            </div>
+            <div class="footerBox more" id="more">
+                <img src="https://cdn-icons-png.flaticon.com/128/9091/9091427.png" id="more" alt="">
+                <p id="more">More</p>
+            </div>
+        </div>
+    </main>
+    <script src="/javaScripts/nav.js"></script>
+    <!-- <script src="/javaScripts/transaction.js"></script> -->
+    <script src="/javaScripts/loader.js"></script>
+</body>
+</html>

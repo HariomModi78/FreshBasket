@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hariom Milk</title>
+    <link rel="stylesheet" href="/stylesheets/adminUserView.css">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#317EFB">
+</head>
+<body> 
+    <main>
+        <div class="header">
+            <div class="input">
+               <h1>Order To Pick-Up</h1>
+               
+            </div>
+            <!-- <img src="/images/sync.png" alt=""> -->
+        </div>
+       <div class="box">
+        <%order.forEach(function(val,index){%>
+            <%if(index==0){%>
+                <div class="user" id="<%=user[index][0]._id%>">
+                    <div class="detail">
+                            <div class="name"><%=user[index][0].username%></div>
+                       <% if(user[index][0].address){%>
+                        <div class="address"><%=user[index][0].address%></div>
+                       <% }else{%>
+                        <div class="address">Addres not Available</div>
+                        <%}%>
+                    </div>
+                    <div class="view">View</div>
+                </div>
+           <% }else if(user[index][0].email != user[index-1][0].email){%>
+
+            <div class="user" id="<%=user[index][0]._id%>">
+                <div class="detail">
+                        <div class="name"><%=user[index][0].username%></div>
+                   <% if(user[index][0].address){%>
+                    <div class="address"><%=user[index][0].address%></div>
+                   <% }else{%>
+                    <div class="address">Addres not Available</div>
+                    <%}%>
+                </div>
+                <div class="view">View</div>
+            </div>
+            <%}%>
+
+        <%})%>
+        
+       </div>
+        <div class="fakeFooter"></div>
+        <div class="footer">
+            <div class="footerBox home">
+                <img src="/images/product.png" alt="">
+                <p>Products</p>
+            </div>
+            <div class="footerBox seller">
+                <img src="/images/user.png" alt="">
+                <p>User Details</p>
+            </div>
+            <div class="footerBox center cart">
+                <img src="/images/order.png" alt="">
+                <p>Orders</p>
+
+            </div>
+            <div class="footerBox feed">
+                <img src="/images/revenue.png" alt="">
+                <p>Revenue</p>
+            </div>
+            <div class="footerBox more">
+                <img src="/images/adminMore.png" alt="">
+                <p>More</p>
+            </div>
+        </div>
+    </main>
+    <script src="/javaScripts/nearOrder.js"></script>
+    
+</body>
+</html>
