@@ -112,7 +112,8 @@ app.post("/verify",async function(req,res){
             let user = await userDataBase.findOne({email:req.cookies.email});
             if(!user){ 
                 await userDataBase.create({
-                    email:req.cookies.email
+                    email:req.cookies.email,
+                    createdAt:new Date()
                 })
             res.render("pin",{work:"Create",url:"createPin"});
 
@@ -276,6 +277,12 @@ app.get("/checkProfit",function(req,res){
 // })
 app.get("/refer",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email1});
+    console.log(new Date() -  new Date(user.createdAt))
+    if(new Date() -  new Date(user.createdAt) > 43200000){
+        await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
+            refer:false
+        });
+    }
     let refer = await referDataBase.find({userId:user._id});
 
     refer.forEach(async function(val){
