@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hariom Milk</title>
+    <link rel="stylesheet" href="/stylesheets/adminAddProduct.css">
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#317EFB">
+</head>
+<body> 
+    <main>
+        <div class="header">
+            Admin Dashboard
+        </div>
+        <p >Add product in <%=categary.name%> Categary</p>
+        <form action="/admin/addProduct" method="post">
+            <input type="text" name="name" id="" placeholder="Product Name" >
+            <input type="text" name="price" id="" placeholder="Product Price" >
+            <input type="text" name="discription" id="" placeholder="Product Discription" >
+            <input type="text" name="quantity" id="" placeholder="Product Quantity" >
+            <input type="text" name="imagePath" id="" placeholder="Image URL" >
+            <input type="text" name="categary" placeholder="Categary" value="<%=categary.name%>">
+            <input type="submit" value="Add Product">
+        </form>
+        <div class="fakeFooter"></div>
+        <div class="footer">
+            <div class="footerBox home">
+                <img src="https://cdn-icons-png.flaticon.com/128/11744/11744074.png" alt="">
+                <p>Products</p>
+            </div>
+            <div class="footerBox seller">
+                <img src="https://cdn-icons-png.flaticon.com/128/4616/4616095.png" alt="">
+                <p>User Details</p>
+            </div>
+            <div class="footerBox center cart">
+                <img src="https://cdn-icons-png.flaticon.com/128/9752/9752284.png" alt="">
+                <p>Orders</p>
+
+            </div>
+            <div class="footerBox milkDetail ">
+                <img src="https://cdn-icons-png.flaticon.com/128/9058/9058574.png" alt="">
+                <p>Milk Details</p>
+            </div>
+            <div class="footerBox more">
+                <img src="https://cdn-icons-png.flaticon.com/128/5996/5996260.png" alt="">
+                <p>More</p>
+            </div>
+        </div>
+    </main>
+    <script src="/javaScripts/adminNav.js"></script>
+    
+</body>
+</html>
