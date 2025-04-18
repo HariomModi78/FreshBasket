@@ -21,6 +21,7 @@ const orderDataBase = require("./models/order.js");
 const feedbackDataBase = require("./models/feedback.js");
 const referDataBase = require("./models/refer.js");
 const permissionDataBase = require("./models/permission.js");
+const scratchCardDataBase = require("./models/scratchCard.js");
 const user = require("./models/user.js");
 const { profile } = require("console");
 
@@ -169,6 +170,7 @@ app.get("/sellerSignup",async function(req,res){
     try{
         let user = await userDataBase.findOne({email:req.cookies.email1});
         let permission = await permissionDataBase.findOne({userId:user._id});
+       
         if(user.type =="farmer"){
             let day = new Date().toISOString().split("T")[0];
             //(day);
@@ -242,8 +244,9 @@ app.get("/feed",async function(req,res){
 })
 app.get("/more",async function(req,res){
     try{
+        let permission = await permissionDataBase.find();
         let user =  await userDataBase.findOne({email:req.cookies.email1});
-        res.render("more",{user:user});
+        res.render("more",{user:user,permission:permission});
     }catch(e){
         res.render("error")
     }
@@ -252,8 +255,9 @@ app.get("/more",async function(req,res){
 app.get("/admin/more",async function(req,res){
     try{
         if(admin(req.cookies.email1)){
+            let permission = await permissionDataBase.find();
             let user =  await userDataBase.findOne({email:req.cookies.email1});
-            res.render("adminMore",{user:user});    
+            res.render("adminMore",{user:user,permission:permission});    
         }
         else{
             res.render("error")
@@ -339,7 +343,12 @@ app.post("/referConfirm",async function(req,res){
 app.get("/wallet",async function(req,res){
     try{
         let user = await userDataBase.findOne({email:req.cookies.email1});
-        res.render("wallet",{user:user});
+        let scratchCard = await scratchCardDataBase.find({userId:user._id});
+        scratchCard.sort((a, b) => {
+            return new Date(b.time) - new Date(a.time)
+        });
+        console.log(scratchCard)
+        res.render("wallet",{user:user,scratchCard:scratchCard});
     }catch(e){
         res.render("error")
     }
@@ -456,9 +465,10 @@ app.get("/admin/product",async function(req,res){
     try{
         if(admin(req.cookies.email1)){
             //.log("admin is watching")
+            let permission = await permissionDataBase.find();
              let categary = await categaryDataBase.find();
     
-            res.render("adminProduct",{categary:categary});
+            res.render("adminProduct",{categary:categary,permission:permission});
         }
         else{
             res.render("error")
@@ -708,16 +718,16 @@ app.get("/admin/permission",async function(req,res){
     })
     let users = await userDataBase.find({_id:userId});
     //(users)
-    res.render("adminPermissionPage",{users:users});
+    res.render("adminPermissionPage",{users:users,permission});
 })
 app.get("/permission/:status/:userId",async function(req,res){
     try{
         if(req.params.status == "approve"){
-            let permission = await permissionDataBase.findOne({userId:req.params.userId});
+            let permission = await permissionDataBase.findOneAndDelete({userId:req.params.userId});
+            
             await userDataBase.findOneAndUpdate({_id:req.params.userId},{
                 type:permission.type
             })
-            await permissionDataBase.findOneAndDelete({userId:req.params.userId});
             res.redirect("/admin/permission");
         }else{
             await permissionDataBase.findOneAndDelete({userId:req.params.userId});
@@ -729,8 +739,8 @@ app.get("/permission/:status/:userId",async function(req,res){
     }
 })
 app.get("/change",async function(req,res){
-    await userDataBase.updateMany({},{
-        type:"user"
+    await userDataBase.deleteMany({},{
+        cashBack:0
     })
     res.send("done")
 })
@@ -833,11 +843,17 @@ app.post("/orderPayment/:productId",async function(req,res){
     }
     
 })   
-app.get("/token/:email",function(req,res){
+app.get("/token/:email",async function(req,res){
     res.cookie("email",req.params.email);
-    res.redirect("/pin");
+    if(await userDataBase.findOne({email:req.cookies.email})){
+        res.redirect("/pin");
+    }else{
+        res.redirect("/login")
+    }
 })
-
+app.get("/login",function(req,res){
+    res.render("login1");
+})
 app.get("/pay/:amount/:userId",async function(req,res){
     try{
         if(req.params.amount>0){
@@ -1185,8 +1201,13 @@ app.get("/confirmOrder/:otp",async function(req,res){
     await userDataBase.findOneAndUpdate({_id:order[0].userId},{
         $inc:{totalSpend:sum}
     }) 
-    
-
+    let cashBack = (Math.random()*10).toFixed(2);
+    let user = await userDataBase.findOne({email:req.cookies.email1});
+    await scratchCardDataBase.create({
+        userId:user._id,
+        amount:cashBack,
+        time:new Date()
+    })
     res.redirect("/nearOrder");
 })
 
@@ -1207,14 +1228,36 @@ app.get("/pin",async function(req,res){
 })
 
 io.on("connect",function(socket){
-    //("connected");
     socket.on("cartOrder",function(product){
 
         //(product);
         socket.emit("confirmOrder",product)
         
     })
-    
+    socket.on("scratch",async function(email){
+        try{
+            let user = await userDataBase.findOne({email:email});
+            let scratch = await scratchCardDataBase.findOneAndUpdate({userId:user._id,status:true},{
+                status:false,
+                time:new Date()
+            });
+            await userDataBase.findOneAndUpdate({email:email},{
+                $inc:{cashBack:scratch.amount,walletBalance:scratch.amount}
+            })
+            await transactionDataBase.create({
+                userId:user._id,
+                direction:"+",
+                paymentMode:"Cash Back",
+                amount:scratch.amount,
+                date:new Date(),
+                totalBalance:user.walletBalance + scratch.amount,
+            })
+            socket.emit("refresh");
+        }catch(e){
+            console.log("Error Ayaa Hai but handle ho gaya")
+        }
+        
+    })
     socket.on("disconnect",function(){
         //("disconnected");
     })
