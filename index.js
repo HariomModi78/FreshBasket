@@ -347,7 +347,7 @@ app.get("/wallet",async function(req,res){
         scratchCard.sort((a, b) => {
             return new Date(b.time) - new Date(a.time)
         });
-        console.log(scratchCard)
+        //(scratchCard)
         res.render("wallet",{user:user,scratchCard:scratchCard});
     }catch(e){
         res.render("error")
@@ -1201,7 +1201,8 @@ app.get("/confirmOrder/:otp",async function(req,res){
     await userDataBase.findOneAndUpdate({_id:order[0].userId},{
         $inc:{totalSpend:sum}
     }) 
-    let cashBack = (Math.random()*10).toFixed(2);
+    let cashBack = (Math.random()*((sum*3)/100)).toFixed(2);
+    //((sum*3)/100);
     let user = await userDataBase.findOne({email:req.cookies.email1});
     await scratchCardDataBase.create({
         userId:user._id,
