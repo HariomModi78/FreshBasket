@@ -22,6 +22,7 @@ const feedbackDataBase = require("./models/feedback.js");
 const referDataBase = require("./models/refer.js");
 const permissionDataBase = require("./models/permission.js");
 const scratchCardDataBase = require("./models/scratchCard.js");
+const deliveryBoyDataBase = require("./models/deliveryBoy.js");
 const user = require("./models/user.js");
 const { profile } = require("console");
 
@@ -465,6 +466,13 @@ function admin(email){
         return true;
     }
     else{
+        return false;
+    }
+}
+function deliveryBoy(user){
+    if(user.type == "deliveryBoy"){
+        return true;
+    }else{
         return false;
     }
 }
@@ -1000,20 +1008,52 @@ app.get("/search",function(req,res){
     res.render("search");
 })
 
-app.get("/deliveryBoyRegistration",function(req,res){
-    res.redirect("/nearOrder")
-    // res.render("deliveryBoyRegistration");
+app.get("/deliveryBoyRegistration",async function(req,res){
+    let user =await userDataBase.findOne({email:req.cookies.email1});
+    if(user.type == "deliveryBoy"){
+        res.redirect("/nearOrder");
+    }else{
+        res.render("deliveryBoyRegistration")
+    }
 })
-app.post("/deliveryBoyRegistration", upload.fields([
+const multiUpload = upload.fields([
+    { name: 'profilePicture', maxCount: 1 },
     { name: 'aadharCard', maxCount: 1 },
-    { name: 'profileImage', maxCount: 1 }
-  ]),async function(req,res){
-    const file = req.file.path;
-    const cloudinaryResponce = await cloudinary.uploader.upload(file,{
+  ]);
+app.post("/deliveryBoyRegistration",multiUpload,async function(req,res){
+    console.log(req.files["profilePicture"][0].path);
+
+    let path1 = await cloudinary.uploader.upload(req.files["profilePicture"][0].path,{
             
         folder:"Documents"
     })
-    res.send("Working")
+    let path2 = await cloudinary.uploader.upload(req.files["aadharCard"][0].path,{
+            
+        folder:"Documents"
+    })
+    let user = await userDataBase.findOneAndUpdate({email:req.cookies.email1},{
+        profilePicture:path1.url,
+        username:req.body.username,
+        mobileNumber:req.body.mobileNumber,
+        address:req.body.address,
+
+    })
+    await permissionDataBase.create({
+        userId:user._id,
+        type:"deliveryBoy"
+    })
+    console.log(path1.url);
+    console.log(path2.url);
+    await deliveryBoyDataBase.create({
+        userId:user._id,
+        aadharCard:path2.url,
+        aadharCardNumber:req.body.aadharCardNumber,
+        vehicleNumber:req.body.vehicleNumber,
+        vehical:req.body.vehicleType,
+        createdAt:new Date(),
+    })
+   
+    res.redirect("/waiting")
 })
 app.get("/removeFromCart/:productId",async function(req,res){
 
@@ -1172,51 +1212,82 @@ app.get("/cartOrderConfirm/:idArray/:itemArray",async function(req,res){
 })
 
 app.get("/nearOrder",async function(req,res){
-    let order = await orderDataBase.find({orderStatus:"order placed"});
-    order.sort((a, b) => a.userId.localeCompare(b.userId));
-    let user = new Array();
-
-    for(let i=0;i<order.length;i++){
-        user.push(await userDataBase.find({_id:order[i].userId}))
-    }
+    let user1 = await userDataBase.findOne({email:req.cookies.email1});
+    console.log(user1)
+    if(user1.type == "deliveryBoy"){
+        let order = await orderDataBase.find({orderStatus:"order placed"});
+        order.sort((a, b) => a.userId.localeCompare(b.userId));
+        let user = new Array();
     
-    res.render("nearOrder",{order:order,user:user});
+        for(let i=0;i<order.length;i++){
+            user.push(await userDataBase.find({_id:order[i].userId}))
+        }
+        
+        res.render("nearOrder",{order:order,user:user});
+    }else{
+        res.redirect("/deliveryBoyRegistration");
+    }
+
+    
 })
 app.get("/nearOrderDetail/:userId",async function(req,res){
-    let user = await userDataBase.findOne({_id:req.params.userId});
-    let order = await orderDataBase.find({orderStatus:"order placed",userId:req.params.userId});
-    order.sort((a, b) => a.name.localeCompare(b.name));
-    //(order)
-    res.render("nearOrderDetail",{order:order,user:user});
+    let user = await userDataBase.findOne({email:req.cookies.email1});
+    if(user.type == "deliveryBoy"){
+        let order = await orderDataBase.find({orderStatus:"order placed",userId:req.params.userId});
+        order.sort((a, b) => a.name.localeCompare(b.name));
+        //(order)
+        res.render("nearOrderDetail",{order:order,user:user});
+    }else{
+        res.render("error");
+    }
+    
 })
 app.post("/openScanner",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email});
-    res.render("scanner");
+    if(user.type == "deliveryBoy"){
+        res.render("scanner");
+    }else{
+        res.render("error")
+    }
+
+    
 })
 app.get("/confirmOrder/:otp",async function(req,res){
-    await orderDataBase.updateMany({otp:req.params.otp},{
-        orderStatus:"delivered"
-    })
-    let order = await orderDataBase.find({otp:req.params.otp});
-    
-    //("Order = ",order);
-    let sum = 0;
-    order.forEach(function(val){
-        sum = sum + val.buyingPrice;
-    })
-    //(order[0].userId);
-    await userDataBase.findOneAndUpdate({_id:order[0].userId},{
-        $inc:{totalSpend:sum}
-    }) 
-    let cashBack = (Math.random()*((sum*3)/100)).toFixed(2);
-    //((sum*3)/100);
     let user = await userDataBase.findOne({email:req.cookies.email1});
-    await scratchCardDataBase.create({
-        userId:user._id,
-        amount:cashBack,
-        time:new Date()
-    })
+    
+    if(user.type == "deliveryBoy"){
+        await orderDataBase.updateMany({otp:req.params.otp},{
+            orderStatus:"delivered"
+        })
+        let order = await orderDataBase.find({otp:req.params.otp});
+        
+        //("Order = ",order);
+        let sum = 0;
+        order.forEach(function(val){
+            sum = sum + val.buyingPrice;
+        })
+        //(order[0].userId);
+        await userDataBase.findOneAndUpdate({_id:order[0].userId},{
+            $inc:{totalSpend:sum}
+        }) 
+        let cashBack = (Math.random()*((sum*1)/100)).toFixed(2);
+        let cashBack1 = (Math.random()*((sum*1)/100)).toFixed(2);
+        //((sum*3)/100);
+        await scratchCardDataBase.create({
+            userId:user._id,
+            amount:cashBack,
+            time:new Date()
+        })
+        await scratchCardDataBase.create({
+            userId:order[0].userId,
+            amount:cashBack1,
+            time:new Date()
+        })
     res.redirect("/nearOrder");
+    }else{
+        res.render("error")
+    }
+    
 })
 
 app.get("/pin",async function(req,res){
