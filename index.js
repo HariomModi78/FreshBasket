@@ -1278,8 +1278,8 @@ app.get("/confirmOrder/:otp",async function(req,res){
         await userDataBase.findOneAndUpdate({_id:order[0].userId},{
             $inc:{totalSpend:sum}
         }) 
-        let cashBack = (Math.random()*((sum*1)/100)).toFixed(2);
-        let cashBack1 = (Math.random()*((sum*1)/100)).toFixed(2);
+        let cashBack = (Math.random()*((sum*1.5)/100)).toFixed(2);
+        let cashBack1 = (Math.random()*((sum*1.5)/100)).toFixed(2);
         //((sum*3)/100);
         await scratchCardDataBase.create({
             userId:user._id,
