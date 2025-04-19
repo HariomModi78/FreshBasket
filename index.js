@@ -1218,9 +1218,14 @@ app.get("/cartOrderConfirm/:idArray/:itemArray",async function(req,res){
 
 app.get("/nearOrder",async function(req,res){
     let user1 = await userDataBase.findOne({email:req.cookies.email1});
-    console.log(user1)
+    // console.log(user1)
+    
     if(user1.type == "deliveryBoy"){
-        let order = await orderDataBase.find({orderStatus:"orderPlaced"});
+        let order = await orderDataBase.find({orderStatus:"orderPacked"});
+        if(user1.email == process.env.email){
+            order = await orderDataBase.find({orderStatus:"orderPlaced"});
+        }
+        console.log(order);
         order.sort((a, b) => a.userId.localeCompare(b.userId));
         let user = new Array();
     
@@ -1241,7 +1246,10 @@ app.get("/nearOrder",async function(req,res){
 app.get("/nearOrderDetail/:userId",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email1});
     if(user.type == "deliveryBoy"){
-        let order = await orderDataBase.find({orderStatus:"orderPlaced",userId:req.params.userId});
+        let order = await orderDataBase.find({orderStatus:"orderPacked"});
+        if(user.email == process.env.email){
+            order = await orderDataBase.find({orderStatus:"orderPlaced"});
+        }
         order.sort((a, b) => a.name.localeCompare(b.name));
         //(order)
         res.render("nearOrderDetail",{order:order,user:user,email:process.env.email});
