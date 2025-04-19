@@ -688,6 +688,10 @@ app.get("/admin/milkUpload/:sellerId",async function(req,res){
     res.render("adminMilkUploadPage",{seller:seller});
 })
 // app.get("/change",async function(req,res){
+//     await orderDataBase.deleteMany();
+//     res.send("done");
+// })
+// app.get("/change",async function(req,res){
 //     await productDataBase.updateMany(
 //         { available: { $exists: true } },
 //         [
@@ -735,6 +739,7 @@ app.get("/admin/permission",async function(req,res){
     //(users)
     res.render("adminPermissionPage",{users:users,permission});
 })
+
 app.get("/permission/:status/:userId",async function(req,res){
     try{
         if(req.params.status == "approve"){
@@ -926,7 +931,7 @@ app.get("/paymentDone/:wallet/:productId/:item",async function(req,res){
                     date:new Date(),
                     buyingPrice:product.price,
                     paymentStatus:"paid",
-                    orderStatus:"order placed",
+                    orderStatus:"orderPlaced",
                     name:product.name,
                     quantity:product.quantity,
                     imagePath:product.imagePath,
@@ -1174,7 +1179,7 @@ app.get("/cartOrderConfirm/:idArray/:itemArray",async function(req,res){
                         date:new Date(),
                         buyingPrice:product[i].price,
                         paymentStatus:"paid",
-                        orderStatus:"order placed",
+                        orderStatus:"orderPlaced",
                         name:product[i].name,
                         quantity:product[i].quantity,
                         imagePath:product[i].imagePath,
@@ -1215,15 +1220,18 @@ app.get("/nearOrder",async function(req,res){
     let user1 = await userDataBase.findOne({email:req.cookies.email1});
     console.log(user1)
     if(user1.type == "deliveryBoy"){
-        let order = await orderDataBase.find({orderStatus:"order placed"});
+        let order = await orderDataBase.find({orderStatus:"orderPlaced"});
         order.sort((a, b) => a.userId.localeCompare(b.userId));
         let user = new Array();
     
         for(let i=0;i<order.length;i++){
             user.push(await userDataBase.find({_id:order[i].userId}))
         }
-        
-        res.render("nearOrder",{order:order,user:user});
+        if(user1.email == process.env.email){
+        res.render("orderPack",{order:order,user:user});
+        }else{
+            res.render("nearOrder",{order:order,user:user});
+        }
     }else{
         res.redirect("/deliveryBoyRegistration");
     }
@@ -1233,10 +1241,10 @@ app.get("/nearOrder",async function(req,res){
 app.get("/nearOrderDetail/:userId",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email1});
     if(user.type == "deliveryBoy"){
-        let order = await orderDataBase.find({orderStatus:"order placed",userId:req.params.userId});
+        let order = await orderDataBase.find({orderStatus:"orderPlaced",userId:req.params.userId});
         order.sort((a, b) => a.name.localeCompare(b.name));
         //(order)
-        res.render("nearOrderDetail",{order:order,user:user});
+        res.render("nearOrderDetail",{order:order,user:user,email:process.env.email});
     }else{
         res.render("error");
     }
@@ -1245,7 +1253,7 @@ app.get("/nearOrderDetail/:userId",async function(req,res){
 app.post("/openScanner",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email});
     if(user.type == "deliveryBoy"){
-        res.render("scanner");
+        res.render("scanner",{email:process.env.email,user:user});
     }else{
         res.render("error")
     }
@@ -1282,6 +1290,19 @@ app.get("/confirmOrder/:otp",async function(req,res){
             userId:order[0].userId,
             amount:cashBack1,
             time:new Date()
+        })
+    res.redirect("/nearOrder");
+    }else{
+        res.render("error")
+    }
+    
+})
+app.get("/orderPack/:otp",async function(req,res){
+    let user = await userDataBase.findOne({email:req.cookies.email1});
+    
+    if(user.email == process.env.email){
+        await orderDataBase.updateMany({otp:req.params.otp},{
+            orderStatus:"orderPacked"
         })
     res.redirect("/nearOrder");
     }else{
