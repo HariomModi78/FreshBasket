@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hariom Milk</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#317EFB">
+    <link rel="stylesheet" href="/stylesheets/nearOrderDetail.css">
+    
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+" crossorigin="anonymous"></script>
+</head>
+<style>
+    /* Fullscreen Loader */
+    #loader {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    /* Loader Animation */
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #ddd;
+        border-top: 5px solid blue;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+<body> 
+    <main>
+        <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+        <h2 class="header">Order Details</h2>
+        <div class="detail">
+            <div class="row">
+                <div class="rowBox1">
+                    <div class="circle">1</div>
+                </div>
+                <div class="rowBox2"> <b>Name :</b><%=user.username%></div>
+            </div>
+            <div class="row">
+                <div class="rowBox1">
+                    <div class="circle">2</div>
+
+                </div>
+                <div class="rowBox2"><b>Contact Number :</b><%=user.mobileNumber%></div>
+            </div>
+            <div class="row">
+                <div class="rowBox1">
+                    <div class="circle">3</div>
+
+                </div>
+                <div class="rowBox2"><b>Delivery Address :</b> <%=user.address%></div>
+            </div>
+            <div class="row">
+                <div class="rowBox1">
+                    <div class="circle">4</div>
+
+                </div>
+                <div class="rowBox2"><b>Order Details :</b></div>
+            </div>
+            <div class="table">
+                <div class="column1">
+                    <div class="row heading">
+                        <b>Item Name</b>
+                    </div>
+                    <%order.forEach(function(val,index){%>
+                        <%if(index==0){%>
+                        <div class="row r"><%=val.name%> <b><%=val.quantity%></b> </div>
+                       <% }else if(order[index].name != order[index-1].name){%>
+            
+                        <div class="row r"><%=val.name%> <b><%=val.quantity%></b> </div>
+
+                        <%}%>
+            
+                    <%})%>
+                    
+                </div>
+                <div class="column2">
+                    <div class="row heading">
+                        <b>Quantity</b>
+                    </div>
+                    <% 
+let i = 0;
+while(i < order.length) {
+    let count = 1;
+    while(i + count < order.length && order[i].name === order[i + count].name) {
+        count++;
+    }
+%>
+    <div class="row r"><%= count %></div>
+<%
+    i += count; 
+}
+%>
+                </div>
+            </div>
+        </div>
+        <div class="fakeFooter"></div>
+        
+        <div class="footer" style="justify-content: space-evenly;">
+            <form action="/openScanner" method="post">
+                <div class="terms">
+                    <input type="checkbox" name="" id="" required>
+                    <b>Terms & Conditions</b>
+                </div>
+                <%if(user.email == email){%>
+                <input type="submit" class="confirmOrder" value="Order is Packed">
+                <%}else{%>
+                    <input type="submit" class="confirmOrder" value="I Deliver This Order">
+                <%}%>
+            </form>
+        </div>
+    </main> 
+    <script src="/javaScripts/loader.js"></script>
+</body> 
+</html>
