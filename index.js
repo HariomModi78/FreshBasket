@@ -67,6 +67,8 @@ function sendMail(to,sub,msg){
 <p><strong>Hariom Modi</strong></p>
 <p>Contact us: hariommilk@gmail.com</p>
 `
+    }).catch(function(e){
+        console.log("error aya ")
     })
 }
 
@@ -248,7 +250,8 @@ app.get("/more",async function(req,res){
     try{
         let permission = await permissionDataBase.find();
         let user =  await userDataBase.findOne({email:req.cookies.email1});
-        res.render("more",{user:user,permission:permission});
+        let order = await orderDataBase.find({orderStatus:"orderPlaced"})
+        res.render("more",{user:user,permission:permission,order:order});
     }catch(e){
         res.render("error")
     }
@@ -1225,7 +1228,6 @@ app.get("/nearOrder",async function(req,res){
         if(user1.email == process.env.email){
             order = await orderDataBase.find({orderStatus:"orderPlaced"});
         }
-        console.log(order);
         order.sort((a, b) => a.userId.localeCompare(b.userId));
         let user = new Array();
     
@@ -1268,6 +1270,7 @@ app.post("/openScanner",async function(req,res){
 
     
 })
+
 app.get("/confirmOrder/:otp",async function(req,res){
     let user = await userDataBase.findOne({email:req.cookies.email1});
     
@@ -1275,6 +1278,7 @@ app.get("/confirmOrder/:otp",async function(req,res){
         await orderDataBase.updateMany({otp:req.params.otp},{
             orderStatus:"delivered"
         })
+
         let order = await orderDataBase.find({otp:req.params.otp});
         
         //("Order = ",order);
@@ -1336,6 +1340,10 @@ app.get("/pin",async function(req,res){
 })
 
 io.on("connect",function(socket){
+    socket.on("orderConfirm",async function(){
+        let user = await userDataBase.findOne({email:process.env.email});
+        socket.to(user.socketId).emit("confirm")
+    })
     socket.on("cartOrder",function(product){
 
         //(product);
@@ -1383,3 +1391,15 @@ io.on("connect",function(socket){
     })
     
 })
+
+
+// io.on("connection", socket => {
+//     const userId = socket.handshake.query.userId;
+//     socket.join(socket.handshake.query.userId);
+  
+//     console.log(`User ${userId} connected with socket ID: ${socket.id}`);
+  
+//     socket.on("disconnect", () => {
+//       console.log(`User ${userId} disconnected`);
+//     });
+//   });
