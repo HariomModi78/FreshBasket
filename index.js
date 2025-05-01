@@ -1272,8 +1272,9 @@ app.post("/openScanner",async function(req,res){
 })
 
 app.get("/confirmOrder/:otp",async function(req,res){
+    try{
+        
     let user = await userDataBase.findOne({email:req.cookies.email1});
-    
     if(user.type == "deliveryBoy"){
         await orderDataBase.updateMany({otp:req.params.otp},{
             orderStatus:"delivered"
@@ -1307,6 +1308,12 @@ app.get("/confirmOrder/:otp",async function(req,res){
     }else{
         res.render("error")
     }
+        
+    }catch(e){
+        res.render("error");
+    }
+    
+    
     
 })
 app.get("/orderPack/:otp",async function(req,res){
